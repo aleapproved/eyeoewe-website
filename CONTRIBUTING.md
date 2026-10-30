@@ -22,7 +22,7 @@ The second command must return the current full `origin/main` SHA. Record that
 SHA as the task base, then create the worktree from that exact commit:
 
 ```bash
-git worktree add -b codex/<short-slug> /path/to/eyeoewedotapp-<short-slug> <exact-origin-main-sha>
+git worktree add -b codex/<short-slug> /path/to/eyeoewe-website-<short-slug> <exact-origin-main-sha>
 ```
 
 Never start from local `main`, even when it appears to match. If the fetch or
