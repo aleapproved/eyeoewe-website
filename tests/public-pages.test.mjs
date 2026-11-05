@@ -45,7 +45,7 @@ test('publishes one branded, intentionally minimal placeholder page', () => {
   assert.match(bodyText, /Eye O Ewe/);
   assert.match(bodyText, /Shared expenses, made simple\./);
   assert.match(bodyText, /Simple\. Free\. Encrypted\./);
-  assert.match(bodyText, /Coming soon\./);
+  assert.match(bodyText, /Invite-only for now\./);
   assert.match(root, /src="\/app-icon\.webp"/);
   assert.match(root, /<img class="brand-mark" src="\/app-icon\.webp"[^>]+width="44"[^>]+height="44"/);
   assert.equal((root.match(/src="\/app-icon\.webp"/g) ?? []).length, 1);
@@ -53,7 +53,7 @@ test('publishes one branded, intentionally minimal placeholder page', () => {
   assert.match(root, /<link rel="icon" type="image\/png" sizes="64x64" href="\/favicon\.png"/);
   assert.match(root, /og:image.*social-preview\.jpg/);
   assert.match(root, /twitter:image.*social-preview\.jpg/);
-  assert.equal((bodyText.match(/Coming soon\./g) ?? []).length, 1);
+  assert.equal((bodyText.match(/Invite-only for now\./g) ?? []).length, 1);
   assert.doesNotMatch(root, /<footer\b|<nav\b|<form\b|<button\b|<input\b/);
   assert.doesNotMatch(root, /hero-visual/);
   assert.doesNotMatch(root, /status-dot/);
@@ -76,7 +76,7 @@ test('publishes one branded, intentionally minimal placeholder page', () => {
 
 test('publishes the exact Play App Signing Digital Asset Links statement', () => {
   assert.ok(exists('public/.well-known/assetlinks.json'));
-  assert.doesNotMatch(assetLinksText, /<html\b|Coming soon/i);
+  assert.doesNotMatch(assetLinksText, /<html\b|Invite-only for now/i);
   assert.ok(Array.isArray(assetLinks));
   assert.equal(assetLinks.length, 1);
   assert.deepEqual(assetLinks[0], {
@@ -130,7 +130,7 @@ test('links the install buttons to exactly the Play internal testing opt-in', ()
     assert.deepEqual(external, [`href="${installUrl}"`]);
     assert.match(page, new RegExp(`<a class="button" href="${installUrl}">Install from Google Play</a>`));
   }
-  assert.match(bodyText, /Coming soon\./);
+  assert.match(bodyText, /Invite-only for now\./);
 });
 
 test('keeps the invitation secret on the join page only', () => {
@@ -218,7 +218,7 @@ test('defines the durable website documentation model and product boundary', () 
     'Eye O Ewe',
     'Shared expenses, made simple\\.',
     'Simple\\. Free\\. Encrypted\\.',
-    'Coming soon\\.',
+    'Invite-only for now\\.',
   ]) {
     assert.match(product, new RegExp(copy));
   }

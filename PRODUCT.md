@@ -10,7 +10,7 @@ The current visible copy is:
 - `Eye O Ewe`
 - `Shared expenses, made simple.`
 - `Simple. Free. Encrypted.`
-- `Coming soon.`
+- `Invite-only for now.`
 - `Install from Google Play`, a plain text link to the Google Play internal testing
   opt-in, so invited testers can install the app.
 
