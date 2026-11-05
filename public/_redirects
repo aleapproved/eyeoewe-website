@@ -1,4 +1,4 @@
 # The placeholder is intentionally the only public page while these routes are reserved.
 /eyeoewe/v1/* / 302
 # Every invitation link shows the same install page; the secret stays in the browser address only.
-/join/* /join/index.html 200
+/join/* /join/ 200

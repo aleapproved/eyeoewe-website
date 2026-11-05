@@ -112,7 +112,8 @@ const joinBody = join.slice(join.indexOf('<body>'), join.indexOf('</body>'));
 const joinText = joinBody.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
 test('serves one install page for every invitation link, rewritten not redirected', () => {
-  assert.match(redirects, /^\/join\/\* \/join\/index\.html 200$/m);
+  // Pages canonicalises /join/index.html to /join/ with a 308, so the rewrite must target /join/.
+  assert.match(redirects, /^\/join\/\* \/join\/ 200$/m);
   assert.equal(
     redirectSources.some((source) => redirectSourceMatches(source, '/.well-known/assetlinks.json')),
     false,
