@@ -133,6 +133,37 @@ h1 span {
   line-height: 1.4;
 }
 
+.join-title {
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  letter-spacing: -0.05em;
+  line-height: 1.04;
+}
+
+.install {
+  margin: clamp(1.5rem, 3vw, 2rem) 0 0;
+}
+
+.button {
+  display: inline-block;
+  padding: 0.85rem 1.5rem;
+  border-radius: 0.9rem;
+  background: var(--ink);
+  color: var(--surface);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--butter);
+  outline-offset: 4px;
+}
+
+.install + .tagline {
+  margin-top: 1.25rem;
+}
+
 @media (max-width: 820px) {
   .hero {
     padding-top: clamp(3.25rem, 8vh, 4.75rem);

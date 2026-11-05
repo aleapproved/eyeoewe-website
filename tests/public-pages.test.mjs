@@ -90,7 +90,7 @@ test('publishes the exact Play App Signing Digital Asset Links statement', () =>
   assert.match(playAppSigningSha256, /^(?:[0-9A-F]{2}:){31}[0-9A-F]{2}$/);
 });
 
-test('keeps the Asset Links and invite routes outside configured redirects', () => {
+test('keeps the Asset Links route outside configured redirects', () => {
   assert.equal(
     redirectSources.some((source) =>
       redirectSourceMatches(source, '/.well-known/assetlinks.json'),
@@ -98,12 +98,46 @@ test('keeps the Asset Links and invite routes outside configured redirects', () 
     false,
   );
   assert.equal(
-    redirectSources.some((source) => redirectSourceMatches(source, '/join/example-secret')),
-    false,
+    redirectSources.some((source) => redirectSourceMatches(source, '/eyeoewe/v1/x')),
+    true,
   );
   assert.match(headers, /^\/\*$/m);
   assert.match(headers, /^\/\.well-known\/assetlinks\.json$/m);
   assert.match(headers, /Content-Type: application\/json/);
+});
+
+const installUrl = 'https://play.google.com/apps/internaltest/4701549140080017667';
+const join = read('public/join/index.html');
+const joinBody = join.slice(join.indexOf('<body>'), join.indexOf('</body>'));
+const joinText = joinBody.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+
+test('serves one install page for every invitation link, rewritten not redirected', () => {
+  assert.match(redirects, /^\/join\/\* \/join\/index\.html 200$/m);
+  assert.equal(
+    redirectSources.some((source) => redirectSourceMatches(source, '/.well-known/assetlinks.json')),
+    false,
+  );
+  assert.match(joinText, /You’ve been invited to a group on Eye O Ewe/);
+  assert.match(joinText, /Install from Google Play/);
+  assert.match(joinText, /Once it’s installed, tap your invitation link again to join\./);
+  assert.match(joinBody, /class="brand-mark" src="\/app-icon\.webp"/);
+});
+
+test('links the install buttons to exactly the Play internal testing opt-in', () => {
+  for (const page of [root, join]) {
+    const links = page.match(/href="https?:[^"]*"/g) ?? [];
+    const external = links.filter((link) => !link.includes('eyeoewe.app'));
+    assert.deepEqual(external, [`href="${installUrl}"`]);
+    assert.match(page, new RegExp(`<a class="button" href="${installUrl}">Install from Google Play</a>`));
+  }
+  assert.match(bodyText, /Coming soon\./);
+});
+
+test('keeps the invitation secret on the join page only', () => {
+  assert.doesNotMatch(join, /<script\b|<form\b|<iframe\b|<img[^>]+src="https?:|<link[^>]+href="https?:/i);
+  assert.doesNotMatch(join, /location|referrer|canonical|og:url|analytics/i);
+  assert.match(headers, /^\/\*\n(?:  .+\n)*  Referrer-Policy: no-referrer$/m);
+  assert.doesNotMatch(headers, /Referrer-Policy: (?!no-referrer$)/m);
 });
 
 test('uses the mobile app visual language with responsive, accessible styling', () => {

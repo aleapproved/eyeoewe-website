@@ -11,6 +11,8 @@ The current visible copy is:
 - `Shared expenses, made simple.`
 - `Simple. Free. Encrypted.`
 - `Coming soon.`
+- `Install from Google Play`, a plain text link to the Google Play internal testing
+  opt-in, so invited testers can install the app.
 
 The homepage has no navigation. It currently has no policy, legal, support, or
 account-deletion content, and no links to those pages.
@@ -18,15 +20,24 @@ account-deletion content, and no links to those pages.
 The homepage also has no:
 
 - signup;
-- store badges;
+- store badge artwork;
 - screenshots;
 - feature grid;
 - analytics or tracking;
 - dark mode or theme toggle; or
 - additional marketing sections.
 
-The four strings above are the complete current visible/on-page messaging
-boundary. Document metadata may restate approved product positioning, but it
+The strings above are the complete current visible/on-page messaging
+boundary for the homepage. Document metadata may restate approved product positioning, but it
 does not authorise additional visible marketing copy. Adding public claims,
 pages, collection mechanisms, or product surfaces requires a separate
 product-owner decision.
+
+## Invitation page
+
+`/join/*` (an invitation link, `https://eyeoewe.app/join/<secret>`) serves one
+page for every secret. It shows the brand header, `You’ve been invited to a
+group on Eye O Ewe`, the same `Install from Google Play` link, and `Once it’s
+installed, tap your invitation link again to join.` It has no script,
+redirect, analytics, or third-party content, and the secret is never read,
+stored, or sent anywhere (`Referrer-Policy: no-referrer` applies).
