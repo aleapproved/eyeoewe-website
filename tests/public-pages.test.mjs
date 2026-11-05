@@ -45,7 +45,7 @@ test('publishes one branded, intentionally minimal placeholder page', () => {
   assert.match(bodyText, /Eye O Ewe/);
   assert.match(bodyText, /Shared expenses, made simple\./);
   assert.match(bodyText, /Simple\. Free\. Encrypted\./);
-  assert.match(bodyText, /Coming soon\./);
+  assert.match(bodyText, /Invite-only for now\./);
   assert.match(root, /src="\/app-icon\.webp"/);
   assert.match(root, /<img class="brand-mark" src="\/app-icon\.webp"[^>]+width="44"[^>]+height="44"/);
   assert.equal((root.match(/src="\/app-icon\.webp"/g) ?? []).length, 1);
@@ -53,7 +53,7 @@ test('publishes one branded, intentionally minimal placeholder page', () => {
   assert.match(root, /<link rel="icon" type="image\/png" sizes="64x64" href="\/favicon\.png"/);
   assert.match(root, /og:image.*social-preview\.jpg/);
   assert.match(root, /twitter:image.*social-preview\.jpg/);
-  assert.equal((bodyText.match(/Coming soon\./g) ?? []).length, 1);
+  assert.equal((bodyText.match(/Invite-only for now\./g) ?? []).length, 1);
   assert.doesNotMatch(root, /<footer\b|<nav\b|<form\b|<button\b|<input\b/);
   assert.doesNotMatch(root, /hero-visual/);
   assert.doesNotMatch(root, /status-dot/);
@@ -76,7 +76,7 @@ test('publishes one branded, intentionally minimal placeholder page', () => {
 
 test('publishes the exact Play App Signing Digital Asset Links statement', () => {
   assert.ok(exists('public/.well-known/assetlinks.json'));
-  assert.doesNotMatch(assetLinksText, /<html\b|Coming soon/i);
+  assert.doesNotMatch(assetLinksText, /<html\b|Invite-only for now/i);
   assert.ok(Array.isArray(assetLinks));
   assert.equal(assetLinks.length, 1);
   assert.deepEqual(assetLinks[0], {
@@ -90,7 +90,7 @@ test('publishes the exact Play App Signing Digital Asset Links statement', () =>
   assert.match(playAppSigningSha256, /^(?:[0-9A-F]{2}:){31}[0-9A-F]{2}$/);
 });
 
-test('keeps the Asset Links and invite routes outside configured redirects', () => {
+test('keeps the Asset Links route outside configured redirects', () => {
   assert.equal(
     redirectSources.some((source) =>
       redirectSourceMatches(source, '/.well-known/assetlinks.json'),
@@ -98,12 +98,47 @@ test('keeps the Asset Links and invite routes outside configured redirects', () 
     false,
   );
   assert.equal(
-    redirectSources.some((source) => redirectSourceMatches(source, '/join/example-secret')),
-    false,
+    redirectSources.some((source) => redirectSourceMatches(source, '/eyeoewe/v1/x')),
+    true,
   );
   assert.match(headers, /^\/\*$/m);
   assert.match(headers, /^\/\.well-known\/assetlinks\.json$/m);
   assert.match(headers, /Content-Type: application\/json/);
+});
+
+const installUrl = 'https://play.google.com/apps/internaltest/4701549140080017667';
+const join = read('public/join/index.html');
+const joinBody = join.slice(join.indexOf('<body>'), join.indexOf('</body>'));
+const joinText = joinBody.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+
+test('serves one install page for every invitation link, rewritten not redirected', () => {
+  // Pages canonicalises /join/index.html to /join/ with a 308, so the rewrite must target /join/.
+  assert.match(redirects, /^\/join\/\* \/join\/ 200$/m);
+  assert.equal(
+    redirectSources.some((source) => redirectSourceMatches(source, '/.well-known/assetlinks.json')),
+    false,
+  );
+  assert.match(joinText, /You’ve been invited to a group on Eye O Ewe/);
+  assert.match(joinText, /Install from Google Play/);
+  assert.match(joinText, /Once it’s installed, tap your invitation link again to join\./);
+  assert.match(joinBody, /class="brand-mark" src="\/app-icon\.webp"/);
+});
+
+test('links the install buttons to exactly the Play internal testing opt-in', () => {
+  for (const page of [root, join]) {
+    const links = page.match(/href="https?:[^"]*"/g) ?? [];
+    const external = links.filter((link) => !link.includes('eyeoewe.app'));
+    assert.deepEqual(external, [`href="${installUrl}"`]);
+    assert.match(page, new RegExp(`<a class="button" href="${installUrl}">Install from Google Play</a>`));
+  }
+  assert.match(bodyText, /Invite-only for now\./);
+});
+
+test('keeps the invitation secret on the join page only', () => {
+  assert.doesNotMatch(join, /<script\b|<form\b|<iframe\b|<img[^>]+src="https?:|<link[^>]+href="https?:/i);
+  assert.doesNotMatch(join, /location|referrer|canonical|og:url|analytics/i);
+  assert.match(headers, /^\/\*\n(?:  .+\n)*  Referrer-Policy: no-referrer$/m);
+  assert.doesNotMatch(headers, /Referrer-Policy: (?!no-referrer$)/m);
 });
 
 test('uses the mobile app visual language with responsive, accessible styling', () => {
@@ -184,7 +219,7 @@ test('defines the durable website documentation model and product boundary', () 
     'Eye O Ewe',
     'Shared expenses, made simple\\.',
     'Simple\\. Free\\. Encrypted\\.',
-    'Coming soon\\.',
+    'Invite-only for now\\.',
   ]) {
     assert.match(product, new RegExp(copy));
   }
