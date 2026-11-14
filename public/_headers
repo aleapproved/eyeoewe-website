@@ -7,3 +7,8 @@
   Referrer-Policy: no-referrer
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
+
+# The invitation page runs its one same-origin script; it still makes no requests.
+/join/*
+  ! Content-Security-Policy
+  Content-Security-Policy: default-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'; img-src 'self'; style-src 'self'; script-src 'self'; connect-src 'none'; font-src 'none'; object-src 'none'; media-src 'none'

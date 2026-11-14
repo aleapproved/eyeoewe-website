@@ -120,8 +120,27 @@ test('serves one install page for every invitation link, rewritten not redirecte
   );
   assert.match(joinText, /You’ve been invited to a group on Eye O Ewe/);
   assert.match(joinText, /Install from Google Play/);
-  assert.match(joinText, /Once it’s installed, tap your invitation link again to join\./);
   assert.match(joinBody, /class="brand-mark" src="\/app-icon\.webp"/);
+});
+
+test('offers Open invitation beside the install button, shown only by the page script', () => {
+  // Without the script (or a valid invitation on Android), the page keeps its plain instructions.
+  assert.match(
+    joinBody,
+    /<a class="button button-secondary" id="open-invitation" hidden>Open invitation<\/a>/,
+  );
+  assert.doesNotMatch(joinBody, /id="open-invitation"[^>]*href=/);
+  assert.match(
+    joinBody,
+    /<p class="tagline" id="reopen-link-note">Once it’s installed, tap your invitation link again to join\.<\/p>/,
+  );
+  assert.match(
+    joinBody,
+    /<p class="tagline" id="open-invitation-note" hidden>Once it’s installed, come back here and tap Open invitation\.<\/p>/,
+  );
+  assert.match(joinBody, /<a class="button" id="install" href=/);
+  assert.match(styles, /\[hidden\] \{\n  display: none !important;\n\}/);
+  assert.ok(exists('public/open-invitation.js'));
 });
 
 test('links the install buttons to exactly the Play internal testing opt-in', () => {
@@ -129,13 +148,16 @@ test('links the install buttons to exactly the Play internal testing opt-in', ()
     const links = page.match(/href="https?:[^"]*"/g) ?? [];
     const external = links.filter((link) => !link.includes('eyeoewe.app'));
     assert.deepEqual(external, [`href="${installUrl}"`]);
-    assert.match(page, new RegExp(`<a class="button" href="${installUrl}">Install from Google Play</a>`));
+    assert.match(page, new RegExp(`<a class="button"(?: id="install")? href="${installUrl}">Install from Google Play</a>`));
   }
   assert.match(bodyText, /Invite-only for now\./);
 });
 
 test('keeps the invitation secret on the join page only', () => {
-  assert.doesNotMatch(join, /<script\b|<form\b|<iframe\b|<img[^>]+src="https?:|<link[^>]+href="https?:/i);
+  // The one script is same-origin and its route still forbids every request (connect-src 'none').
+  assert.deepEqual(join.match(/<script\b[^>]*>/g), ['<script src="/open-invitation.js">']);
+  assert.match(join, /<script src="\/open-invitation\.js"><\/script>/);
+  assert.doesNotMatch(join, /<form\b|<iframe\b|<img[^>]+src="https?:|<link[^>]+href="https?:/i);
   assert.doesNotMatch(join, /location|referrer|canonical|og:url|analytics/i);
   assert.match(headers, /^\/\*\n(?:  .+\n)*  Referrer-Policy: no-referrer$/m);
   assert.doesNotMatch(headers, /Referrer-Policy: (?!no-referrer$)/m);
@@ -181,6 +203,17 @@ test('serves restrictive headers compatible with this static page', () => {
     assert.ok(headers.includes(directive), "missing header directive: " + directive);
   }
   assert.doesNotMatch(headers, /unsafe-inline|unsafe-eval|https?:\/\//);
+  // Only the invitation page may run a script, and only its own; it replaces the site-wide policy
+  // because two policies would both apply and script-src 'none' would still block it.
+  const csp = [...headers.matchAll(/^  Content-Security-Policy: (.+)$/gm)].map((match) => match[1]);
+  assert.equal(csp.length, 2);
+  assert.equal(csp[1], csp[0].replace("script-src 'none'", "script-src 'self'"));
+  assert.notEqual(csp[1], csp[0]);
+  assert.match(
+    headers,
+    /^\/join\/\*\n  ! Content-Security-Policy\n  Content-Security-Policy: [^\n]+$/m,
+  );
+  assert.ok(headers.indexOf('/join/*') > headers.indexOf('/*\n'), 'the join rule must follow the site-wide rule');
   assert.match(headers, /Permissions-Policy:/);
   assert.match(headers, /Referrer-Policy: no-referrer/);
   assert.match(headers, /X-Content-Type-Options: nosniff/);

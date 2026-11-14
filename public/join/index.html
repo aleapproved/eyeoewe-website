@@ -8,7 +8,7 @@
     <meta name="robots" content="noindex" />
     <title>Join a group — Eye O Ewe</title>
     <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
-    <link rel="stylesheet" href="/styles.css?v=10" />
+    <link rel="stylesheet" href="/styles.css?v=11" />
   </head>
   <body>
     <main class="site-shell">
@@ -23,11 +23,14 @@
         <div class="hero-copy">
           <h1 id="hero-title" class="join-title">You’ve been invited to a group on Eye O Ewe</h1>
           <p class="install">
-            <a class="button" href="https://play.google.com/apps/internaltest/4701549140080017667">Install from Google Play</a>
+            <a class="button" id="install" href="https://play.google.com/apps/internaltest/4701549140080017667">Install from Google Play</a>
+            <a class="button button-secondary" id="open-invitation" hidden>Open invitation</a>
           </p>
-          <p class="tagline">Once it’s installed, tap your invitation link again to join.</p>
+          <p class="tagline" id="reopen-link-note">Once it’s installed, tap your invitation link again to join.</p>
+          <p class="tagline" id="open-invitation-note" hidden>Once it’s installed, come back here and tap Open invitation.</p>
         </div>
       </section>
     </main>
+    <script src="/open-invitation.js"></script>
   </body>
 </html>

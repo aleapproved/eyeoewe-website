@@ -37,8 +37,12 @@ the following from read-only evidence:
 - the custom domain serves the expected stylesheet and brand asset;
 - the response includes the security headers defined in `public/_headers`,
   including the CSP, `Permissions-Policy`, `Referrer-Policy`,
-  `X-Content-Type-Options`, and `X-Frame-Options`; and
-- a reserved `/eyeoewe/v1/...` route returns the configured redirect to `/`.
+  `X-Content-Type-Options`, and `X-Frame-Options`;
+- a reserved `/eyeoewe/v1/...` route returns the configured redirect to `/`;
+  and
+- an invitation route such as `/join/example` returns the invitation page
+  (200, no redirect) with a single `Content-Security-Policy` whose
+  `script-src` is `'self'`.
 
 For example, inspect headers without following the redirect:
 
@@ -47,6 +51,7 @@ curl -fsSI https://eyeoewe.app/
 curl -fsSI https://eyeoewe.app/styles.css
 curl -fsSI https://eyeoewe.app/app-icon.webp
 curl -sS -D - -o /dev/null https://eyeoewe.app/eyeoewe/v1/example
+curl -sS -D - -o /dev/null https://eyeoewe.app/join/example
 ```
 
 Keep local tests, GitHub checks, Pages deployment records, and live HTTP

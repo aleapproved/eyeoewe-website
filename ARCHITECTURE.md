@@ -13,7 +13,11 @@
   root-relative paths. Do not add generated build output or local tooling
   state to the deployable tree.
 - The website has no backend, account data, runtime application code, or
-  tracking.
+  tracking. Its one script, `public/open-invitation.js`, runs on the
+  invitation page only: it reads the invitation from the address to build the
+  Open invitation button and makes no request. `public/_headers` allows
+  same-origin scripts on `/join/*` alone; every other page keeps
+  `script-src 'none'`.
 
 ## Deployment invariants
 

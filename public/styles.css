@@ -45,6 +45,10 @@ img {
   max-width: 100%;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 .site-shell {
   display: flex;
   flex-direction: column;
@@ -140,12 +144,16 @@ h1 span {
 }
 
 .install {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   margin: clamp(1.5rem, 3vw, 2rem) 0 0;
 }
 
 .button {
   display: inline-block;
   padding: 0.85rem 1.5rem;
+  border: 1px solid var(--ink);
   border-radius: 0.9rem;
   background: var(--ink);
   color: var(--surface);
@@ -155,12 +163,17 @@ h1 span {
   text-decoration: none;
 }
 
+.button-secondary {
+  background: transparent;
+  color: var(--ink);
+}
+
 .button:focus-visible {
   outline: 2px solid var(--butter);
   outline-offset: 4px;
 }
 
-.install + .tagline {
+.install ~ .tagline {
   margin-top: 1.25rem;
 }
 
