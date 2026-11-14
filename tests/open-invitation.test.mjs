@@ -12,6 +12,8 @@ const androidChrome =
   'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36';
 const iPhoneSafari =
   'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
+const androidWebView =
+  'Mozilla/5.0 (Linux; Android 16; sdk_gphone64_x86_64 Build/BP22.250325.006; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/138.0.7204.63 Mobile Safari/537.36';
 const desktopChrome =
   'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36';
 
@@ -91,9 +93,22 @@ test('off Android there is no app to open, so the page keeps its plain instructi
   }
 });
 
-test('the script reads the address but makes no request and stores nothing', () => {
+test('in an in-app browser built on Android WebView, which cannot follow intent: links, it does too', () => {
+  assertUnchanged(openPage({ userAgent: androidWebView }));
+});
+
+test('the script reads the address but sends and stores nothing', () => {
+  // The page's CSP would not stop a script loading /anything?<secret> as an image or navigating to
+  // it, so the script's own code is what keeps the secret on the phone.
   assert.doesNotMatch(
     script,
-    /fetch|XMLHttpRequest|sendBeacon|WebSocket|EventSource|import\(|new Image|Storage|cookie|postMessage|window\.open|location\s*=|location\.(assign|replace|href)/,
+    /fetch|XMLHttpRequest|sendBeacon|WebSocket|EventSource|import\(|Image|Storage|cookie|postMessage|open\(|assign\(|replace\(|createElement|innerHTML|outerHTML|insertAdjacent|appendChild|append\(|setAttribute|write\(|\.src\b|location\.href|location\s*=/,
+  );
+  // It changes only the button's link and which elements are hidden.
+  const code = script.replace(/`[^`]*`/g, '``').replace(/\/\/.*$/gm, '');
+  const assignments = [...code.matchAll(/([\w.]+)\s*=(?![=>])/g)].map((match) => match[1]);
+  assert.deepEqual(
+    assignments.filter((target) => target.includes('.')),
+    ['open.href', 'open.hidden', 'reopenNote.hidden', 'openNote.hidden'],
   );
 });

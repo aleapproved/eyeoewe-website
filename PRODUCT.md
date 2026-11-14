@@ -44,10 +44,12 @@ On Android, when the address holds a well-formed invitation, the page also
 shows an `Open invitation` button beside the install link, and the line under
 them reads `Once it’s installed, come back here and tap Open invitation.` The
 button hands the same link to the app with an `intent:` URL naming the app's
-package; without the app, it goes where the install link goes.
+package; without the app, it goes where the install link goes. In an in-app
+browser built on Android's WebView, which can't open another app from a link,
+the page keeps the line above instead.
 
 The secret, the part after `#`, never reaches the server. The page's one
 script (`public/open-invitation.js`) reads it from the address and puts it only
-into that button's link; it stores nothing and sends nothing, and the page's
-`connect-src 'none'` blocks any request. The page has no redirect, analytics,
-or third-party content, and `Referrer-Policy: no-referrer` applies.
+into that button's link; it stores nothing and sends nothing. The page has no
+redirect, analytics, or third-party content, and `Referrer-Policy: no-referrer`
+applies.

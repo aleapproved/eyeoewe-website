@@ -2,8 +2,7 @@
 //
 // The button hands the link to the app with an intent: URL naming its package, because Chrome keeps a
 // tap on a link to this same site in the browser. The secret (the part after #) goes only into that
-// URL, which Android delivers to the named app alone; this script sends nothing anywhere, and the
-// page's Content-Security-Policy (connect-src 'none') blocks any request from it.
+// URL, which Android delivers to the named app alone. This script sends and stores nothing.
 //
 // Android reads the intent's data as everything before the last #, so the invitation's own # part
 // survives: intent://eyeoewe.app/join/<id>#<secret>#Intent;scheme=https;...;end becomes
@@ -14,8 +13,12 @@
   // The same patterns the app applies to an incoming invitation.
   const invitePath = /^\/join\/([0-9a-f]{32})$/.exec(location.pathname);
   const secret = /^#([0-9a-f]{64})$/.exec(location.hash);
-  // There is no app to open elsewhere, and intent: links work only on Android.
-  if (invitePath === null || secret === null || !/\bAndroid\b/.test(navigator.userAgent)) return;
+  // There is no app to open elsewhere, and intent: links work only in Android's browsers. An in-app
+  // browser built on Android's WebView (its user agent says "; wv)") loads the intent: link itself
+  // and shows ERR_UNKNOWN_URL_SCHEME, so there the page keeps its plain instructions.
+  const userAgent = navigator.userAgent;
+  if (invitePath === null || secret === null) return;
+  if (!/\bAndroid\b/.test(userAgent) || /; wv\)/.test(userAgent)) return;
 
   const install = document.getElementById('install');
   const open = document.getElementById('open-invitation');
