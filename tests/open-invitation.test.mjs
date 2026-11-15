@@ -25,7 +25,7 @@ const notes = {
 };
 
 /** Runs the page script against the join page's elements at the given address, as a browser would. */
-function openPage({ pathname = `/join/${inviteId}`, hash = `#${secret}`, userAgent = androidChrome } = {}) {
+function openPage({ source = script, pathname = `/join/${inviteId}`, hash = `#${secret}`, userAgent = androidChrome } = {}) {
   const elements = {
     'join-action': { hidden: true },
     'join-button': {},
@@ -36,7 +36,7 @@ function openPage({ pathname = `/join/${inviteId}`, hash = `#${secret}`, userAge
     'note-no-app': { hidden: true },
     'note-computer': { hidden: true },
   };
-  vm.runInNewContext(script, {
+  vm.runInNewContext(source, {
     location: { pathname, hash, search: '' },
     navigator: { userAgent },
     document: { getElementById: (id) => elements[id] ?? null },
@@ -118,6 +118,15 @@ test('on an iPhone, which has no store link yet, the page says the app is not on
   assert.equal(page['join-button'].href, undefined);
 });
 
+test('a platform with a store link but no intent gets the install line with that link, and no button', () => {
+  const appStore = 'https://apps.apple.com/app/eyeoewe/id1';
+  const page = openPage({ source: script.replace('ios: null', `ios: '${appStore}'`), userAgent: iPhoneSafari });
+  assert.deepEqual(seen(page), plainInstall);
+  assert.equal(page.install.href, appStore);
+  assert.equal(page['install-join'].href, appStore);
+  assert.equal(page['join-button'].href, undefined);
+});
+
 test('on a computer the page says to open the invitation on a phone', () => {
   for (const userAgent of [desktopChrome, '']) {
     const page = openPage({ userAgent });
@@ -136,7 +145,7 @@ test('the script reads the address but sends and stores nothing', () => {
   // it, so the script's own code is what keeps the secret on the phone.
   assert.doesNotMatch(
     script,
-    /fetch|XMLHttpRequest|sendBeacon|WebSocket|EventSource|import\(|Image|Storage|cookie|postMessage|open\(|assign\(|replace\(|createElement|innerHTML|outerHTML|insertAdjacent|appendChild|append\(|setAttribute|write\(|\.src\b|location\.href|location\s*=/,
+    /console|fetch|XMLHttpRequest|sendBeacon|WebSocket|EventSource|import\(|Image|Storage|cookie|postMessage|open\(|assign\(|replace\(|createElement|innerHTML|outerHTML|insertAdjacent|appendChild|append\(|setAttribute|write\(|\.src\b|location\.href|location\s*=/,
   );
   // It changes only links and which elements are hidden.
   const code = script.replace(/`[^`]*`/g, '``').replace(/\/\/.*$/gm, '');

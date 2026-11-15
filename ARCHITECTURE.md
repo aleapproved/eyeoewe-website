@@ -13,11 +13,14 @@
   root-relative paths. Do not add generated build output or local tooling
   state to the deployable tree.
 - The website has no backend, account data, or tracking, and no runtime
-  application code beyond one page script. That script,
-  `public/open-invitation.js`, runs on the invitation page only: it reads the
-  invitation from the address to build the Join the group button, and picks
-  the instruction for the visitor's platform. It sends and stores nothing. `public/_headers` allows same-origin scripts on
-  `/join/*` alone; every other page keeps `script-src 'none'`.
+  application code beyond page scripts. The invitation page's script,
+  `public/open-invitation.js`, reads the invitation from the address to build
+  the Join the group button, and picks the instruction for the visitor's
+  platform. It sends and stores nothing. `public/_headers` allows same-origin
+  scripts on `/join/*` alone.
+- Before iPhones get a store link in that script, the site must serve
+  `/.well-known/apple-app-site-association`, or tapping the invitation link
+  again won't open the app.
 
 ## Deployment invariants
 

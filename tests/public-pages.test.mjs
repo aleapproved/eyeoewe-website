@@ -161,8 +161,8 @@ test('links every install link to exactly the Play internal testing opt-in', () 
 
 test('keeps the invitation secret on the join page only', () => {
   // The one script is same-origin; tests/open-invitation.test.mjs pins that it sends nothing.
-  assert.deepEqual(join.match(/<script\b[^>]*>/g), ['<script src="/open-invitation.js">']);
-  assert.match(join, /<script src="\/open-invitation\.js"><\/script>/);
+  assert.deepEqual(join.match(/<script\b[^>]*>/g), ['<script src="/open-invitation.js?v=1">']);
+  assert.match(join, /<script src="\/open-invitation\.js\?v=1"><\/script>/);
   assert.doesNotMatch(join, /<form\b|<iframe\b|<img[^>]+src="https?:|<link[^>]+href="https?:/i);
   assert.doesNotMatch(join, /location|referrer|canonical|og:url|analytics/i);
   assert.match(headers, /^\/\*\n(?:  .+\n)*  Referrer-Policy: no-referrer$/m);
@@ -268,7 +268,7 @@ test('defines the durable website documentation model and product boundary', () 
   assert.match(architecture, /static website/);
   assert.match(architecture, /All deployable source lives under\s+`public\/`/);
   assert.match(architecture, /no framework or application build system/);
-  assert.match(architecture, /no backend, account data, or tracking, and no runtime\s+application code beyond one page script/);
+  assert.match(architecture, /no backend, account data, or tracking, and no runtime\s+application code beyond page scripts/);
 });
 
 test('documents the fetched origin/main task-base and reconciliation rule', () => {
