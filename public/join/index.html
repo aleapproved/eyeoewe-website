@@ -8,7 +8,7 @@
     <meta name="robots" content="noindex" />
     <title>Join a group — Eye O Ewe</title>
     <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
-    <link rel="stylesheet" href="/styles.css?v=11" />
+    <link rel="stylesheet" href="/styles.css?v=12" />
   </head>
   <body>
     <main class="site-shell">
@@ -22,12 +22,13 @@
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
           <h1 id="hero-title" class="join-title">You’ve been invited to a group on Eye O Ewe</h1>
-          <p class="install">
-            <a class="button" id="install" href="https://play.google.com/apps/internaltest/4701549140080017667">Install from Google Play</a>
-            <a class="button button-secondary" id="open-invitation" hidden>Open invitation</a>
+          <p class="join-action" id="join-action" hidden>
+            <a class="button button-block" id="join-button">Join the group</a>
           </p>
-          <p class="tagline" id="reopen-link-note">Once it’s installed, tap your invitation link again to join.</p>
-          <p class="tagline" id="open-invitation-note" hidden>Once it’s installed, come back here and tap Open invitation.</p>
+          <p class="note" id="note-join" hidden>Don’t have the app yet? <a id="install-join" href="https://play.google.com/apps/internaltest/4701549140080017667">Install Eye O Ewe</a>, then come back to this page and tap Join the group.</p>
+          <p class="note" id="note-install"><a id="install" href="https://play.google.com/apps/internaltest/4701549140080017667">Install Eye O Ewe</a>, then tap your invitation link again.</p>
+          <p class="note" id="note-no-app" hidden>Eye O Ewe isn’t on this phone yet.</p>
+          <p class="note" id="note-computer" hidden>Open this invitation on your phone.</p>
         </div>
       </section>
     </main>

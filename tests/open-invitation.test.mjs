@@ -17,13 +17,24 @@ const androidWebView =
 const desktopChrome =
   'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36';
 
+const notes = {
+  join: 'note-join',
+  install: 'note-install',
+  noApp: 'note-no-app',
+  computer: 'note-computer',
+};
+
 /** Runs the page script against the join page's elements at the given address, as a browser would. */
 function openPage({ pathname = `/join/${inviteId}`, hash = `#${secret}`, userAgent = androidChrome } = {}) {
   const elements = {
-    install: { href: installUrl, hidden: false },
-    'open-invitation': { hidden: true },
-    'reopen-link-note': { hidden: false },
-    'open-invitation-note': { hidden: true },
+    'join-action': { hidden: true },
+    'join-button': {},
+    install: { href: installUrl },
+    'install-join': { href: installUrl },
+    'note-join': { hidden: true },
+    'note-install': { hidden: false },
+    'note-no-app': { hidden: true },
+    'note-computer': { hidden: true },
   };
   vm.runInNewContext(script, {
     location: { pathname, hash, search: '' },
@@ -33,29 +44,34 @@ function openPage({ pathname = `/join/${inviteId}`, hash = `#${secret}`, userAge
   return elements;
 }
 
-function assertUnchanged(elements) {
-  assert.equal(elements['open-invitation'].hidden, true);
-  assert.equal(elements['open-invitation'].href, undefined);
-  assert.equal(elements['reopen-link-note'].hidden, false);
-  assert.equal(elements['open-invitation-note'].hidden, true);
+/** What the visitor sees: the button if shown, and the one note that is not hidden. */
+function seen(page) {
+  return {
+    button: !page['join-action'].hidden,
+    notes: Object.entries(notes)
+      .filter(([, id]) => !page[id].hidden)
+      .map(([name]) => name),
+  };
 }
 
-test('on Android, Open invitation hands exactly the invitation link to the app', () => {
+const plainInstall = { button: false, notes: ['install'] };
+
+test('in Android Chrome, Join the group hands exactly the invitation link to the app', () => {
   const page = openPage();
-  assert.equal(page['open-invitation'].hidden, false);
+  assert.deepEqual(seen(page), { button: true, notes: ['join'] });
   assert.equal(
-    page['open-invitation'].href,
+    page['join-button'].href,
     `intent://eyeoewe.app/join/${inviteId}#${secret}#Intent;scheme=https;package=app.eyeoewe;` +
       `S.browser_fallback_url=${encodeURIComponent(installUrl)};end`,
   );
-  assert.equal(page['reopen-link-note'].hidden, true);
-  assert.equal(page['open-invitation-note'].hidden, false);
+  assert.equal(page.install.href, installUrl);
+  assert.equal(page['install-join'].href, installUrl);
 });
 
 test('the intent carries the link Android reads as the app expects', () => {
   // Android's Intent.parseUri takes the data from everything before the last #, then replaces
   // "intent:" with the scheme; the app accepts only https://eyeoewe.app/join/<id>#<secret>.
-  const href = openPage()['open-invitation'].href;
+  const href = openPage()['join-button'].href;
   const marker = href.lastIndexOf('#');
   assert.ok(href.startsWith('#Intent;', marker));
   const data = `https:${href.slice(0, marker).slice('intent:'.length)}`;
@@ -66,7 +82,7 @@ test('the intent carries the link Android reads as the app expects', () => {
   assert.equal(url.search, '');
 });
 
-test('without a well-formed invitation, the page keeps its plain instructions', () => {
+test('on Android without a well-formed invitation, there is no button, only the install line', () => {
   for (const address of [
     { hash: '' },
     { hash: '#' },
@@ -83,18 +99,36 @@ test('without a well-formed invitation, the page keeps its plain instructions', 
     { pathname: `/join/${inviteId}/extra` },
     { pathname: `/other/${inviteId}` },
   ]) {
-    assertUnchanged(openPage(address));
+    const page = openPage(address);
+    assert.deepEqual(seen(page), plainInstall);
+    assert.equal(page['join-button'].href, undefined);
   }
 });
 
-test('off Android there is no app to open, so the page keeps its plain instructions', () => {
-  for (const userAgent of [iPhoneSafari, desktopChrome, '']) {
-    assertUnchanged(openPage({ userAgent }));
+test('in an in-app browser built on Android WebView, which cannot follow intent: links, there is no button', () => {
+  const page = openPage({ userAgent: androidWebView });
+  assert.deepEqual(seen(page), plainInstall);
+  assert.equal(page['join-button'].href, undefined);
+  assert.equal(page.install.href, installUrl);
+});
+
+test('on an iPhone, which has no store link yet, the page says the app is not on the phone', () => {
+  const page = openPage({ userAgent: iPhoneSafari });
+  assert.deepEqual(seen(page), { button: false, notes: ['noApp'] });
+  assert.equal(page['join-button'].href, undefined);
+});
+
+test('on a computer the page says to open the invitation on a phone', () => {
+  for (const userAgent of [desktopChrome, '']) {
+    const page = openPage({ userAgent });
+    assert.deepEqual(seen(page), { button: false, notes: ['computer'] });
+    assert.equal(page['join-button'].href, undefined);
   }
 });
 
-test('in an in-app browser built on Android WebView, which cannot follow intent: links, it does too', () => {
-  assertUnchanged(openPage({ userAgent: androidWebView }));
+test('the page script keeps the same store link as the page itself', () => {
+  assert.equal(/android: '([^']+)'/.exec(script)[1], installUrl);
+  assert.match(script, /ios: null/);
 });
 
 test('the script reads the address but sends and stores nothing', () => {
@@ -104,11 +138,11 @@ test('the script reads the address but sends and stores nothing', () => {
     script,
     /fetch|XMLHttpRequest|sendBeacon|WebSocket|EventSource|import\(|Image|Storage|cookie|postMessage|open\(|assign\(|replace\(|createElement|innerHTML|outerHTML|insertAdjacent|appendChild|append\(|setAttribute|write\(|\.src\b|location\.href|location\s*=/,
   );
-  // It changes only the button's link and which elements are hidden.
+  // It changes only links and which elements are hidden.
   const code = script.replace(/`[^`]*`/g, '``').replace(/\/\/.*$/gm, '');
-  const assignments = [...code.matchAll(/([\w.]+)\s*=(?![=>])/g)].map((match) => match[1]);
+  const assignments = [...code.matchAll(/([\w.\[\]]+)\s*=(?![=>])/g)].map((match) => match[1]);
   assert.deepEqual(
     assignments.filter((target) => target.includes('.')),
-    ['open.href', 'open.hidden', 'reopenNote.hidden', 'openNote.hidden'],
+    ['notes[key].hidden', 'joinAction.hidden', 'link.href', 'joinButton.href'],
   );
 });

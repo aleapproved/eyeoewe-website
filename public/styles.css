@@ -143,10 +143,8 @@ h1 span {
   line-height: 1.04;
 }
 
-.install {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
+.install,
+.join-action {
   margin: clamp(1.5rem, 3vw, 2rem) 0 0;
 }
 
@@ -162,10 +160,16 @@ h1 span {
   text-decoration: none;
 }
 
-.button-secondary {
-  background: transparent;
-  box-shadow: inset 0 0 0 1px var(--ink);
+.button-block {
+  display: block;
+  text-align: center;
+}
+
+.note {
+  margin: 1.25rem 0 0;
   color: var(--ink);
+  font-size: 1.05rem;
+  line-height: 1.45;
 }
 
 .button:focus-visible {
@@ -173,7 +177,7 @@ h1 span {
   outline-offset: 4px;
 }
 
-.install ~ .tagline {
+.install + .tagline {
   margin-top: 1.25rem;
 }
 

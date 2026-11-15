@@ -119,37 +119,43 @@ test('serves one install page for every invitation link, rewritten not redirecte
     false,
   );
   assert.match(joinText, /You’ve been invited to a group on Eye O Ewe/);
-  assert.match(joinText, /Install from Google Play/);
   assert.match(joinBody, /class="brand-mark" src="\/app-icon\.webp"/);
 });
 
-test('offers Open invitation beside the install button, shown only by the page script', () => {
-  // Without the script (or a valid invitation on Android), the page keeps its plain instructions.
+test('says what to do on every platform, and shows the Join button only when the page script says so', () => {
+  // Without the script, the page shows just the install line.
   assert.match(
     joinBody,
-    /<a class="button button-secondary" id="open-invitation" hidden>Open invitation<\/a>/,
+    /<p class="join-action" id="join-action" hidden>\s*<a class="button button-block" id="join-button">Join the group<\/a>\s*<\/p>/,
   );
-  assert.doesNotMatch(joinBody, /id="open-invitation"[^>]*href=/);
+  assert.doesNotMatch(joinBody, /id="join-button"[^>]*href=/);
   assert.match(
     joinBody,
-    /<p class="tagline" id="reopen-link-note">Once it’s installed, tap your invitation link again to join\.<\/p>/,
+    new RegExp(
+      `<p class="note" id="note-join" hidden>Don’t have the app yet\\? <a id="install-join" href="${installUrl}">Install Eye O Ewe</a>, then come back to this page and tap Join the group\\.</p>`,
+    ),
   );
   assert.match(
     joinBody,
-    /<p class="tagline" id="open-invitation-note" hidden>Once it’s installed, come back here and tap Open invitation\.<\/p>/,
+    new RegExp(
+      `<p class="note" id="note-install"><a id="install" href="${installUrl}">Install Eye O Ewe</a>, then tap your invitation link again\\.</p>`,
+    ),
   );
-  assert.match(joinBody, /<a class="button" id="install" href=/);
+  assert.match(joinBody, /<p class="note" id="note-no-app" hidden>Eye O Ewe isn’t on this phone yet\.<\/p>/);
+  assert.match(joinBody, /<p class="note" id="note-computer" hidden>Open this invitation on your phone\.<\/p>/);
   assert.match(styles, /\[hidden\] \{\n  display: none !important;\n\}/);
   assert.ok(exists('public/open-invitation.js'));
 });
 
-test('links the install buttons to exactly the Play internal testing opt-in', () => {
-  for (const page of [root, join]) {
-    const links = page.match(/href="https?:[^"]*"/g) ?? [];
-    const external = links.filter((link) => !link.includes('eyeoewe.app'));
-    assert.deepEqual(external, [`href="${installUrl}"`]);
-    assert.match(page, new RegExp(`<a class="button"(?: id="install")? href="${installUrl}">Install from Google Play</a>`));
-  }
+test('links every install link to exactly the Play internal testing opt-in', () => {
+  const links = root.match(/href="https?:[^"]*"/g) ?? [];
+  assert.deepEqual(
+    links.filter((link) => !link.includes('eyeoewe.app')),
+    [`href="${installUrl}"`],
+  );
+  assert.match(root, new RegExp(`<a class="button" href="${installUrl}">Install from Google Play</a>`));
+  const joinLinks = (join.match(/href="https?:[^"]*"/g) ?? []).filter((link) => !link.includes('eyeoewe.app'));
+  assert.deepEqual(joinLinks, [`href="${installUrl}"`, `href="${installUrl}"`]);
   assert.match(bodyText, /Invite-only for now\./);
 });
 
