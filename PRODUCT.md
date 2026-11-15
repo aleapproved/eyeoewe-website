@@ -13,8 +13,7 @@ screens, in this order:
   invited testers can install the app.
 - Two screens of the real app side by side, with no
   captions and made-up names and amounts: a group with its balances, and adding
-  an expense. Each has a light and a dark image, and the one for the theme in
-  force is shown.
+  an expense. The same light screens show in both themes.
 - `Free and ad-free`, with `There’s no limit on how many expenses you can add.`
 - A footer with the support email.
 

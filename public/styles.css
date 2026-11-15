@@ -53,7 +53,6 @@ img {
    (html[data-theme], set by theme.js). */
 
 :root {
-  --shot-border: #D3D0CD;
   --toggle-moon: block;
   --toggle-sun: none;
 }
@@ -67,7 +66,6 @@ img {
     --muted: #A2B2C2;
     --line: #2A3C4F;
     --line-strong: #3A4F64;
-    --shot-border: #3A4F64;
     --toggle-moon: none;
     --toggle-sun: block;
   }
@@ -81,7 +79,6 @@ img {
   --muted: #A2B2C2;
   --line: #2A3C4F;
   --line-strong: #3A4F64;
-  --shot-border: #3A4F64;
   --toggle-moon: none;
   --toggle-sun: block;
 }

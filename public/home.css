@@ -44,62 +44,15 @@
   margin: clamp(2.5rem, 6vw, 4.5rem) auto 0;
 }
 
-.shot {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  aspect-ratio: 9 / 19.5;
-  border: 2px dashed var(--shot-border);
-  border-radius: 1.75rem;
-  background: var(--surface);
-  color: var(--muted);
-  padding: 0.75rem;
-  font-size: 0.85rem;
-  line-height: 1.6;
-  text-align: center;
-}
-
+/* The same light screens show in both themes. Dark screens, when there are some, are added as
+   images with a class (say shot-dark) hidden in light and shown in dark, with the light ones hidden. */
 .shot-img {
+  display: block;
   width: 100%;
   height: auto;
-  border: 1px solid var(--line);
-  border-radius: 1.75rem;
-  vertical-align: bottom;
-}
-
-/* Show the light screens in light and the dark screens in dark, following the theme in force. */
-.shot-dark {
-  display: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .shot-light {
-    display: none;
-  }
-
-  :root:not([data-theme="light"]) .shot-dark {
-    display: flex;
-  }
-
-  :root:not([data-theme="light"]) img.shot-dark {
-    display: block;
-  }
-}
-
-:root[data-theme="dark"] .shot-light {
-  display: none;
-}
-
-:root[data-theme="dark"] .shot-dark {
-  display: flex;
-}
-
-:root[data-theme="dark"] img.shot-dark {
-  display: block;
-}
-
-:root[data-theme="light"] .shot-dark {
-  display: none;
+  border: 1px solid var(--line-strong);
+  border-radius: 1rem;
+  box-shadow: 0 6px 24px rgb(7 34 64 / 10%);
 }
 
 .free {

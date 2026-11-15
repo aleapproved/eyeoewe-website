@@ -92,13 +92,16 @@ test('keeps the two screenshots side by side at every width', () => {
   assert.doesNotMatch(product, /stacked/);
 });
 
-test('shows four marked screenshot slots, light and dark, switched by the theme', () => {
-  assert.equal((root.match(/class="shot shot-light"/g) ?? []).length, 2);
-  assert.equal((root.match(/class="shot shot-dark"/g) ?? []).length, 2);
-  assert.equal((root.match(/Screenshot placeholder/g) ?? []).length, 4);
-  assert.match(home, /\.shot-dark \{\n  display: none;/);
-  assert.match(home, /:root\[data-theme="dark"\] \.shot-light \{\n  display: none;/);
-  assert.match(home, /@media \(prefers-color-scheme: dark\)[\s\S]*:root:not\(\[data-theme="light"\]\) \.shot-light/);
+test('shows the two real app screens, with real alt text and sizes', () => {
+  const images = root.match(/<img class="shot-img"[^>]*>/g) ?? [];
+  assert.equal(images.length, 2);
+  assert.match(images[0], /src="\/app-group-light\.webp" width="576" height="1280" alt="Eye O Ewe showing a trip’s balances: who owes whom"/);
+  assert.match(images[1], /src="\/app-expense-light\.webp" width="576" height="1280" alt="Eye O Ewe adding an expense, split equally between four people"/);
+  assert.doesNotMatch(root, /placeholder/i);
+  assert.ok(exists('public/app-group-light.webp'));
+  assert.ok(exists('public/app-expense-light.webp'));
+  assert.match(home, /\.shot-img \{[^}]*border-radius: 1rem;[^}]*box-shadow:/);
+  assert.doesNotMatch(home, /\.shot \{|shot-border/);
 });
 
 test('follows the phone theme with a toggle that remembers the choice, from a same-origin script', () => {
