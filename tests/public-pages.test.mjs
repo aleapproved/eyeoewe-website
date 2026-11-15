@@ -295,15 +295,14 @@ test('defines the durable website documentation model and product boundary', () 
   assert.match(readme, /\[RELEASE\.md\]\(RELEASE\.md\)/);
   for (const copy of [
     'Eye O Ewe',
-    'Shared expenses, made simple\\.',
-    'Simple\\. Free\\. Encrypted\\.',
-    'Invite-only for now\\.',
+    'Split bills with friends, privately\\.',
+    'Free and ad-free',
   ]) {
     assert.match(product, new RegExp(copy));
   }
   assert.match(product, /no navigation/);
-  assert.match(product, /no policy, legal, support, or\s+account-deletion content/);
-  assert.match(product, /analytics or tracking/);
+  assert.match(product, /signup, feature lists, icon rows, stock photos,\s+testimonials/);
+  assert.match(product, /analytics or\s+tracking/);
   assert.match(architecture, /static website/);
   assert.match(architecture, /All deployable source lives under\s+`public\/`/);
   assert.match(architecture, /no framework or application build system/);
