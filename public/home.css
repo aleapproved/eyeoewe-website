@@ -1,0 +1,141 @@
+/* The homepage only: its layout and its screenshots. */
+
+.home-hero {
+  flex: none;
+  padding-bottom: 0;
+}
+
+.home-title {
+  font-size: clamp(2.6rem, 6.2vw, 4.6rem);
+  letter-spacing: -0.055em;
+  line-height: 1.02;
+}
+
+.home-hero .tagline {
+  max-width: 34rem;
+}
+
+.store-badge {
+  margin: 1rem 0 0 -0.55rem;
+}
+
+.store-badge a {
+  display: inline-block;
+  border-radius: 0.6rem;
+}
+
+.store-badge a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 0;
+}
+
+.store-badge img {
+  display: block;
+  width: 11.5rem;
+  height: auto;
+}
+
+.screens {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 18rem));
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  width: 100%;
+  max-width: 1120px;
+  margin: clamp(2.5rem, 6vw, 4.5rem) auto 0;
+}
+
+.shot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 9 / 19.5;
+  border: 2px dashed var(--shot-border);
+  border-radius: 1.75rem;
+  background: var(--surface);
+  color: var(--muted);
+  padding: 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.shot-img {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 1.75rem;
+  vertical-align: bottom;
+}
+
+/* Show the light screens in light and the dark screens in dark, following the theme in force. */
+.shot-dark {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .shot-light {
+    display: none;
+  }
+
+  :root:not([data-theme="light"]) .shot-dark {
+    display: flex;
+  }
+
+  :root:not([data-theme="light"]) img.shot-dark {
+    display: block;
+  }
+}
+
+:root[data-theme="dark"] .shot-light {
+  display: none;
+}
+
+:root[data-theme="dark"] .shot-dark {
+  display: flex;
+}
+
+:root[data-theme="dark"] img.shot-dark {
+  display: block;
+}
+
+:root[data-theme="light"] .shot-dark {
+  display: none;
+}
+
+.free {
+  width: 100%;
+  max-width: 1120px;
+  margin: clamp(3.5rem, 9vw, 6.5rem) auto 0;
+}
+
+.free h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(1.9rem, 3.4vw, 2.6rem);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+}
+
+.free p {
+  max-width: 34rem;
+  margin: 0.75rem 0 0;
+  color: var(--muted);
+  font-size: clamp(1.08rem, 1.7vw, 1.3rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+}
+
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.75rem;
+  width: 100%;
+  max-width: 1120px;
+  margin: clamp(4rem, 10vw, 7rem) auto 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.94rem;
+}

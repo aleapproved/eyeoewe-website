@@ -3,33 +3,36 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#FAF8F6" />
-    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#FAF8F6" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0D1925" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
     <meta
       name="description"
-      content="Eye O Ewe makes shared expenses simple. Simple. Free. Encrypted."
+      content="Your expenses are encrypted, so only your group can see them. Most apps can see everything you add."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://eyeoewe.app/" />
-    <meta property="og:title" content="Eye O Ewe — Shared expenses, made simple." />
+    <meta property="og:title" content="Eye O Ewe — Split bills with friends, privately." />
     <meta
       property="og:description"
-      content="Eye O Ewe makes shared expenses simple. Simple. Free. Encrypted."
+      content="Your expenses are encrypted, so only your group can see them. Most apps can see everything you add."
     />
     <meta property="og:image" content="https://eyeoewe.app/social-preview.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="1200" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Eye O Ewe — Shared expenses, made simple." />
+    <meta name="twitter:title" content="Eye O Ewe — Split bills with friends, privately." />
     <meta
       name="twitter:description"
-      content="Eye O Ewe makes shared expenses simple. Simple. Free. Encrypted."
+      content="Your expenses are encrypted, so only your group can see them. Most apps can see everything you add."
     />
     <meta name="twitter:image" content="https://eyeoewe.app/social-preview.jpg" />
-    <title>Eye O Ewe — Shared expenses, made simple.</title>
+    <title>Eye O Ewe — Split bills with friends, privately.</title>
     <link rel="canonical" href="https://eyeoewe.app/" />
     <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
-    <link rel="stylesheet" href="/styles.css?v=12" />
+    <link rel="stylesheet" href="/styles.css?v=13" />
+    <link rel="stylesheet" href="/home.css?v=1" />
+    <script src="/theme.js?v=1"></script>
   </head>
   <body>
     <main class="site-shell">
@@ -38,21 +41,46 @@
           <img class="brand-mark" src="/app-icon.webp" alt="" width="44" height="44" />
           <span>Eye O Ewe</span>
         </a>
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark theme" hidden>
+          <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4" /><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" /></g></svg>
+        </button>
       </header>
 
-      <section class="hero" aria-labelledby="hero-title">
+      <section class="hero home-hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <h1 id="hero-title">
-            <span>Shared expenses,</span>
-            <span>made simple.</span>
-          </h1>
-          <p class="tagline">Simple. Free. Encrypted.</p>
-          <p class="status">Invite-only for now.</p>
-          <p class="install">
-            <a class="button" href="https://play.google.com/apps/internaltest/4701549140080017667">Install from Google Play</a>
+          <h1 id="hero-title" class="home-title">Split bills with friends, privately.</h1>
+          <p class="tagline">Your expenses are encrypted, so only your group can see them. Most apps can see everything you add.</p>
+          <p class="store-badge">
+            <a href="https://play.google.com/apps/internaltest/4701549140080017667"><img src="/google-play-badge.png" alt="Get it on Google Play" width="646" height="250" /></a>
           </p>
         </div>
       </section>
+
+      <section class="screens" aria-label="The app">
+        <!-- Placeholders. Each becomes <img class="shot-img shot-light|shot-dark" src alt width height>, with real alt text describing the screen. -->
+        <div class="shot shot-light" role="img" aria-label="Placeholder: a group with its balances, light">
+          <span>Screenshot placeholder<br />Group with balances<br />Light</span>
+        </div>
+        <div class="shot shot-dark" role="img" aria-label="Placeholder: a group with its balances, dark">
+          <span>Screenshot placeholder<br />Group with balances<br />Dark</span>
+        </div>
+        <div class="shot shot-light" role="img" aria-label="Placeholder: adding an expense, light">
+          <span>Screenshot placeholder<br />Adding an expense<br />Light</span>
+        </div>
+        <div class="shot shot-dark" role="img" aria-label="Placeholder: adding an expense, dark">
+          <span>Screenshot placeholder<br />Adding an expense<br />Dark</span>
+        </div>
+      </section>
+
+      <section class="free" aria-labelledby="free-title">
+        <h2 id="free-title">Free and ad-free</h2>
+        <p>There’s no limit on how many expenses you can add.</p>
+      </section>
+
+      <footer class="site-footer">
+        <a href="mailto:hello@eyeoewe.app">hello@eyeoewe.app</a>
+      </footer>
     </main>
   </body>
 </html>

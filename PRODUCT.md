@@ -2,36 +2,33 @@
 
 ## Public boundary
 
-The product name is **Eye O Ewe**. The website is intentionally a sparse
-coming-soon landing page for the product.
+The product name is **Eye O Ewe**. The homepage is short, one or two phone
+screens, in this order:
 
-The current visible copy is:
+- `Split bills with friends, privately.`
+- `Your expenses are encrypted, so only your group can see them. Most apps can
+  see everything you add.`
+- Google's official `Get it on Google Play` badge, used as Google's badge
+  guidelines require, linking to the Google Play internal testing opt-in so
+  invited testers can install the app.
+- Two screens of the real app side by side, with no
+  captions and made-up names and amounts: a group with its balances, and adding
+  an expense. Each has a light and a dark image, and the one for the theme in
+  force is shown.
+- `Free and ad-free`, with `There’s no limit on how many expenses you can add.`
+- A footer with the support email.
 
-- `Eye O Ewe`
-- `Shared expenses, made simple.`
-- `Simple. Free. Encrypted.`
-- `Invite-only for now.`
-- `Install from Google Play`, a plain text link to the Google Play internal testing
-  opt-in, so invited testers can install the app.
+The whole site, the invitation page too, follows the phone's light or dark
+setting. A small toggle in the header overrides it and remembers the choice on
+that device.
 
-The homepage has no navigation. It currently has no policy, legal, support, or
-account-deletion content, and no links to those pages.
+The homepage has no navigation, signup, feature lists, icon rows, stock photos,
+testimonials, analytics or tracking.
 
-The homepage also has no:
-
-- signup;
-- store badge artwork;
-- screenshots;
-- feature grid;
-- analytics or tracking;
-- dark mode or theme toggle; or
-- additional marketing sections.
-
-The strings above are the complete current visible/on-page messaging
-boundary for the homepage. Document metadata may restate approved product positioning, but it
-does not authorise additional visible marketing copy. Adding public claims,
-pages, collection mechanisms, or product surfaces requires a separate
-product-owner decision.
+Document metadata may restate approved product positioning, but it does not
+authorise additional visible marketing copy. Adding public claims, pages,
+collection mechanisms, or product surfaces requires a separate product-owner
+decision.
 
 ## Invitation page
 

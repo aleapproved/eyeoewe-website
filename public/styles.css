@@ -49,6 +49,80 @@ img {
   display: none !important;
 }
 
+/* Dark follows the phone's setting (the app's dark palette) unless the toggle chose a theme
+   (html[data-theme], set by theme.js). */
+
+:root {
+  --shot-border: #D3D0CD;
+  --toggle-moon: block;
+  --toggle-sun: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --canvas: #0D1925;
+    --surface: #14222F;
+    --ink: #E8EEF5;
+    --muted: #A2B2C2;
+    --line: #2A3C4F;
+    --line-strong: #3A4F64;
+    --shot-border: #3A4F64;
+    --toggle-moon: none;
+    --toggle-sun: block;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --canvas: #0D1925;
+  --surface: #14222F;
+  --ink: #E8EEF5;
+  --muted: #A2B2C2;
+  --line: #2A3C4F;
+  --line-strong: #3A4F64;
+  --shot-border: #3A4F64;
+  --toggle-moon: none;
+  --toggle-sun: block;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.theme-toggle .icon-moon {
+  display: var(--toggle-moon);
+}
+
+.theme-toggle .icon-sun {
+  display: var(--toggle-sun);
+}
+
 .site-shell {
   display: flex;
   flex-direction: column;
@@ -77,7 +151,7 @@ img {
 }
 
 .brand:focus-visible {
-  outline: 2px solid var(--butter);
+  outline: 2px solid var(--ink);
   outline-offset: 5px;
 }
 
@@ -128,15 +202,6 @@ h1 span {
   line-height: 1.4;
 }
 
-.status {
-  margin: 0.8rem 0 0;
-  color: var(--soft);
-  font-size: 0.94rem;
-  font-weight: 500;
-  letter-spacing: 0;
-  line-height: 1.4;
-}
-
 .join-title {
   font-size: clamp(2.4rem, 5vw, 3.8rem);
   letter-spacing: -0.05em;
@@ -173,7 +238,7 @@ h1 span {
 }
 
 .button:focus-visible {
-  outline: 2px solid var(--butter);
+  outline: 2px solid var(--ink);
   outline-offset: 4px;
 }
 
