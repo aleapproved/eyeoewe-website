@@ -20,6 +20,7 @@ const desktopChrome =
 const notes = {
   join: 'note-join',
   install: 'note-install',
+  webview: 'note-webview',
   noApp: 'note-no-app',
   computer: 'note-computer',
 };
@@ -31,8 +32,10 @@ function openPage({ source = script, pathname = `/join/${inviteId}`, hash = `#${
     'join-button': {},
     install: { href: installUrl },
     'install-join': { href: installUrl },
+    'install-webview': { href: installUrl },
     'note-join': { hidden: true },
     'note-install': { hidden: false },
+    'note-webview': { hidden: true },
     'note-no-app': { hidden: true },
     'note-computer': { hidden: true },
   };
@@ -107,9 +110,9 @@ test('on Android without a well-formed invitation, there is no button, only the 
 
 test('in an in-app browser built on Android WebView, which cannot follow intent: links, there is no button', () => {
   const page = openPage({ userAgent: androidWebView });
-  assert.deepEqual(seen(page), plainInstall);
+  assert.deepEqual(seen(page), { button: false, notes: ['webview'] });
   assert.equal(page['join-button'].href, undefined);
-  assert.equal(page.install.href, installUrl);
+  assert.equal(page['install-webview'].href, installUrl);
 });
 
 test('on an iPhone, which has no store link yet, the page says the app is not on the phone', () => {

@@ -141,6 +141,12 @@ test('says what to do on every platform, and shows the Join button only when the
       `<p class="note" id="note-install"><a id="install" href="${installUrl}">Install Eye O Ewe</a>, then tap your invitation link again\\.</p>`,
     ),
   );
+  assert.match(
+    joinBody,
+    new RegExp(
+      `<p class="note" id="note-webview" hidden>To join, open this page in your browser\\. Don’t have the app yet\\? <a id="install-webview" href="${installUrl}">Install Eye O Ewe</a> first\\.</p>`,
+    ),
+  );
   assert.match(joinBody, /<p class="note" id="note-no-app" hidden>Eye O Ewe isn’t on iPhone yet\.<\/p>/);
   assert.match(joinBody, /<p class="note" id="note-computer" hidden>Open this invitation on your phone\.<\/p>/);
   assert.match(styles, /\[hidden\] \{\n  display: none !important;\n\}/);
@@ -155,7 +161,7 @@ test('links every install link to exactly the Play internal testing opt-in', () 
   );
   assert.match(root, new RegExp(`<a class="button" href="${installUrl}">Install from Google Play</a>`));
   const joinLinks = (join.match(/href="https?:[^"]*"/g) ?? []).filter((link) => !link.includes('eyeoewe.app'));
-  assert.deepEqual(joinLinks, [`href="${installUrl}"`, `href="${installUrl}"`]);
+  assert.deepEqual(joinLinks, [installUrl, installUrl, installUrl].map((url) => `href="${url}"`));
   assert.match(bodyText, /Invite-only for now\./);
 });
 

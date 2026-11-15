@@ -19,10 +19,11 @@
   const byId = (id) => document.getElementById(id);
   const joinAction = byId('join-action');
   const joinButton = byId('join-button');
-  const installLinks = [byId('install'), byId('install-join')];
+  const installLinks = [byId('install'), byId('install-join'), byId('install-webview')];
   const notes = {
     join: byId('note-join'),
     install: byId('note-install'),
+    webview: byId('note-webview'),
     noApp: byId('note-no-app'),
     computer: byId('note-computer'),
   };
@@ -51,9 +52,9 @@
   const secret = /^#([0-9a-f]{64})$/.exec(location.hash);
   // intent: links work only in Android's browsers. An in-app browser built on Android's WebView (its
   // user agent says "; wv)") loads the intent: link itself and shows ERR_UNKNOWN_URL_SCHEME, so there
-  // the page only says to install and tap the invitation link again.
-  const canOpen = platform === 'android' && !/; wv\)/.test(userAgent);
-  if (!canOpen || invitePath === null || secret === null) return show('install');
+  // the page says to open it in the browser instead.
+  if (platform === 'android' && /; wv\)/.test(userAgent)) return show('webview');
+  if (platform !== 'android' || invitePath === null || secret === null) return show('install');
 
   // Without the app, Chrome follows the fallback, which is the store link.
   joinButton.href =

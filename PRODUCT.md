@@ -44,9 +44,12 @@ invited to a group on Eye O Ewe`. What follows depends on the visitor:
   Ewe, then come back to this page and tap Join the group.` The button hands the
   invitation to the app with an `intent:` URL naming the app's package; without
   the app, it goes to the store link.
-- Android in-app browsers built on WebView, which can't do that, and Android
-  pages without a well-formed invitation, and visitors without the script: no
-  button, and `Install Eye O Ewe, then tap your invitation link again.`
+- Android in-app browsers built on WebView, which can't do that: no button, and
+  `To join, open this page in your browser. Don’t have the app yet? Install Eye
+  O Ewe first.`, with `Install Eye O Ewe` as the store link.
+- Android pages without a well-formed invitation, and visitors without the
+  script: no button, and `Install Eye O Ewe, then tap your invitation link
+  again.`
 - Phones with no store link for the app: no button, and
   `Eye O Ewe isn’t on iPhone yet.` Once the app is there, giving that
   platform a store link in the script makes it show the line above instead.
