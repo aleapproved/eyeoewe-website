@@ -141,7 +141,7 @@ test('says what to do on every platform, and shows the Join button only when the
       `<p class="note" id="note-install"><a id="install" href="${installUrl}">Install Eye O Ewe</a>, then tap your invitation link again\\.</p>`,
     ),
   );
-  assert.match(joinBody, /<p class="note" id="note-no-app" hidden>Eye O Ewe isn’t on this phone yet\.<\/p>/);
+  assert.match(joinBody, /<p class="note" id="note-no-app" hidden>Eye O Ewe isn’t on iPhone yet\.<\/p>/);
   assert.match(joinBody, /<p class="note" id="note-computer" hidden>Open this invitation on your phone\.<\/p>/);
   assert.match(styles, /\[hidden\] \{\n  display: none !important;\n\}/);
   assert.ok(exists('public/open-invitation.js'));

@@ -48,7 +48,7 @@ invited to a group on Eye O Ewe`. What follows depends on the visitor:
   pages without a well-formed invitation, and visitors without the script: no
   button, and `Install Eye O Ewe, then tap your invitation link again.`
 - Phones with no store link for the app: no button, and
-  `Eye O Ewe isn’t on this phone yet.` Once the app is there, giving that
+  `Eye O Ewe isn’t on iPhone yet.` Once the app is there, giving that
   platform a store link in the script makes it show the line above instead.
 - Computers: no button, and `Open this invitation on your phone.`
 
