@@ -119,23 +119,57 @@ test('serves one install page for every invitation link, rewritten not redirecte
     false,
   );
   assert.match(joinText, /You’ve been invited to a group on Eye O Ewe/);
-  assert.match(joinText, /Install from Google Play/);
-  assert.match(joinText, /Once it’s installed, tap your invitation link again to join\./);
   assert.match(joinBody, /class="brand-mark" src="\/app-icon\.webp"/);
 });
 
-test('links the install buttons to exactly the Play internal testing opt-in', () => {
-  for (const page of [root, join]) {
-    const links = page.match(/href="https?:[^"]*"/g) ?? [];
-    const external = links.filter((link) => !link.includes('eyeoewe.app'));
-    assert.deepEqual(external, [`href="${installUrl}"`]);
-    assert.match(page, new RegExp(`<a class="button" href="${installUrl}">Install from Google Play</a>`));
-  }
+test('says what to do on every platform, and shows the Join button only when the page script says so', () => {
+  // Without the script, the page shows just the install line.
+  assert.match(
+    joinBody,
+    /<p class="join-action" id="join-action" hidden>\s*<a class="button button-block" id="join-button">Join the group<\/a>\s*<\/p>/,
+  );
+  assert.doesNotMatch(joinBody, /id="join-button"[^>]*href=/);
+  assert.match(
+    joinBody,
+    new RegExp(
+      `<p class="note" id="note-join" hidden>Don’t have the app yet\\? <a id="install-join" href="${installUrl}">Install Eye O Ewe</a>, then come back to this page and tap Join the group\\.</p>`,
+    ),
+  );
+  assert.match(
+    joinBody,
+    new RegExp(
+      `<p class="note" id="note-install"><a id="install" href="${installUrl}">Install Eye O Ewe</a>, then tap your invitation link again\\.</p>`,
+    ),
+  );
+  assert.match(
+    joinBody,
+    new RegExp(
+      `<p class="note" id="note-webview" hidden>To join, open this page in your browser\\. Don’t have the app yet\\? <a id="install-webview" href="${installUrl}">Install Eye O Ewe</a> first\\.</p>`,
+    ),
+  );
+  assert.match(joinBody, /<p class="note" id="note-no-app" hidden>Eye O Ewe isn’t on iPhone yet\.<\/p>/);
+  assert.match(joinBody, /<p class="note" id="note-computer" hidden>Open this invitation on your phone\.<\/p>/);
+  assert.match(styles, /\[hidden\] \{\n  display: none !important;\n\}/);
+  assert.ok(exists('public/open-invitation.js'));
+});
+
+test('links every install link to exactly the Play internal testing opt-in', () => {
+  const links = root.match(/href="https?:[^"]*"/g) ?? [];
+  assert.deepEqual(
+    links.filter((link) => !link.includes('eyeoewe.app')),
+    [`href="${installUrl}"`],
+  );
+  assert.match(root, new RegExp(`<a class="button" href="${installUrl}">Install from Google Play</a>`));
+  const joinLinks = (join.match(/href="https?:[^"]*"/g) ?? []).filter((link) => !link.includes('eyeoewe.app'));
+  assert.deepEqual(joinLinks, [installUrl, installUrl, installUrl].map((url) => `href="${url}"`));
   assert.match(bodyText, /Invite-only for now\./);
 });
 
 test('keeps the invitation secret on the join page only', () => {
-  assert.doesNotMatch(join, /<script\b|<form\b|<iframe\b|<img[^>]+src="https?:|<link[^>]+href="https?:/i);
+  // The one script is same-origin; tests/open-invitation.test.mjs pins that it sends nothing.
+  assert.deepEqual(join.match(/<script\b[^>]*>/g), ['<script src="/open-invitation.js?v=1">']);
+  assert.match(join, /<script src="\/open-invitation\.js\?v=1"><\/script>/);
+  assert.doesNotMatch(join, /<form\b|<iframe\b|<img[^>]+src="https?:|<link[^>]+href="https?:/i);
   assert.doesNotMatch(join, /location|referrer|canonical|og:url|analytics/i);
   assert.match(headers, /^\/\*\n(?:  .+\n)*  Referrer-Policy: no-referrer$/m);
   assert.doesNotMatch(headers, /Referrer-Policy: (?!no-referrer$)/m);
@@ -181,6 +215,17 @@ test('serves restrictive headers compatible with this static page', () => {
     assert.ok(headers.includes(directive), "missing header directive: " + directive);
   }
   assert.doesNotMatch(headers, /unsafe-inline|unsafe-eval|https?:\/\//);
+  // Only the invitation page may run a script, and only its own; it replaces the site-wide policy
+  // because two policies would both apply and script-src 'none' would still block it.
+  const csp = [...headers.matchAll(/^  Content-Security-Policy: (.+)$/gm)].map((match) => match[1]);
+  assert.equal(csp.length, 2);
+  assert.equal(csp[1], csp[0].replace("script-src 'none'", "script-src 'self'"));
+  assert.notEqual(csp[1], csp[0]);
+  assert.match(
+    headers,
+    /^\/join\/\*\n  ! Content-Security-Policy\n  Content-Security-Policy: [^\n]+$/m,
+  );
+  assert.ok(headers.indexOf('/join/*') > headers.indexOf('/*\n'), 'the join rule must follow the site-wide rule');
   assert.match(headers, /Permissions-Policy:/);
   assert.match(headers, /Referrer-Policy: no-referrer/);
   assert.match(headers, /X-Content-Type-Options: nosniff/);
@@ -229,7 +274,7 @@ test('defines the durable website documentation model and product boundary', () 
   assert.match(architecture, /static website/);
   assert.match(architecture, /All deployable source lives under\s+`public\/`/);
   assert.match(architecture, /no framework or application build system/);
-  assert.match(architecture, /no backend, account data, runtime application code, or\s+tracking/);
+  assert.match(architecture, /no backend, account data, or tracking, and no runtime\s+application code beyond page scripts/);
 });
 
 test('documents the fetched origin/main task-base and reconciliation rule', () => {
