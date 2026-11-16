@@ -1,0 +1,125 @@
+/* The homepage only: a centred column, then the screenshots. */
+
+.home-hero,
+.free,
+.touch,
+.screens {
+  width: 100%;
+  max-width: 1120px;
+  margin-right: auto;
+  margin-left: auto;
+  text-align: center;
+}
+
+.home-hero {
+  padding-top: clamp(2.5rem, 6vh, 5rem);
+}
+
+.home-title {
+  font-size: clamp(2.6rem, 6.2vw, 4.6rem);
+  letter-spacing: -0.055em;
+  line-height: 1.02;
+}
+
+.home-hero .tagline,
+.free p,
+.touch p {
+  max-width: 34rem;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.free {
+  margin-top: clamp(2rem, 5vw, 3rem);
+}
+
+.free h2,
+.touch h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(1.5rem, 2.6vw, 1.9rem);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+}
+
+.free p,
+.touch p {
+  margin-top: 0.75rem;
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: clamp(1.08rem, 1.7vw, 1.3rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+}
+
+.touch a {
+  color: var(--ink);
+  text-underline-offset: 0.2em;
+}
+
+.store-badge {
+  margin: 1.5rem 0 0;
+  text-align: center;
+}
+
+.store-badge a {
+  display: inline-block;
+  border-radius: 0.6rem;
+}
+
+.store-badge a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 0;
+}
+
+.store-badge img {
+  display: block;
+  width: 11.5rem;
+  height: auto;
+}
+
+.screens {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 17rem));
+  gap: clamp(1rem, 3vw, 2.5rem);
+  justify-content: center;
+  margin-top: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+.shot-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line-strong);
+  border-radius: 1rem;
+  box-shadow: 0 6px 24px rgb(7 34 64 / 10%);
+}
+
+/* One image of each pair shows, for the theme in force; a hidden image is not read aloud. */
+.shot-dark {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .shot-light {
+    display: none;
+  }
+
+  :root:not([data-theme="light"]) .shot-dark {
+    display: block;
+  }
+}
+
+:root[data-theme="dark"] .shot-light {
+  display: none;
+}
+
+:root[data-theme="dark"] .shot-dark {
+  display: block;
+}
+
+.touch {
+  margin-top: clamp(3.5rem, 9vw, 6.5rem);
+}
