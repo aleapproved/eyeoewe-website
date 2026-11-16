@@ -249,13 +249,40 @@ test('uses the mobile app visual language with responsive, accessible styling', 
   ]) {
     assert.match(styles, new RegExp(color));
   }
-  assert.match(styles, /Georgia, "Times New Roman", serif/);
+  assert.doesNotMatch(styles + home, /Georgia|Times New Roman|--display/);
   assert.match(styles, /\.brand:focus-visible/);
   assert.match(styles, /@media \(max-width: 820px\)/);
   assert.match(styles, /@media \(max-width: 420px\)/);
   assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/);
   assert.doesNotMatch(styles, /\.hero-visual/);
   assert.doesNotMatch(styles, /\.status-dot/);
+});
+
+test('self-hosts small Roboto and Noto Serif fonts with their licences', () => {
+  const fonts = [
+    ['Roboto-400Regular.woff2', 40000],
+    ['Roboto-600SemiBold.woff2', 40000],
+    ['Roboto-700Bold.woff2', 40000],
+    ['NotoSerif-400Regular.woff2', 10000],
+  ];
+  let total = 0;
+  for (const [name, ceiling] of fonts) {
+    const file = resolve(process.cwd(), 'public/fonts', name);
+    assert.ok(existsSync(file), name + ' is missing');
+    const bytes = readFileSync(file);
+    assert.equal(bytes.subarray(0, 4).toString('latin1'), 'wOF2');
+    assert.ok(bytes.length < ceiling, name + ' is too big: ' + bytes.length);
+    total += bytes.length;
+    assert.ok(styles.includes('url("/fonts/' + name + '")'), name + ' is not in @font-face');
+  }
+  assert.ok(total < 120000);
+  assert.equal(styles.match(/font-display: swap;/g).length, fonts.length);
+  assert.match(styles, /font-family:\s*"Roboto", -apple-system/);
+  assert.match(styles, /\.brand span \{[^}]*"Noto Serif"/);
+  assert.ok(exists('public/fonts/OFL-Roboto.txt'));
+  assert.ok(exists('public/fonts/OFL-NotoSerif.txt'));
+  assert.match(read('public/fonts/OFL-Roboto.txt'), /SIL OPEN FONT LICENSE/);
+  assert.match(read('public/fonts/OFL-NotoSerif.txt'), /SIL OPEN FONT LICENSE/);
 });
 
 test('serves restrictive headers compatible with this static page', () => {
@@ -269,7 +296,7 @@ test('serves restrictive headers compatible with this static page', () => {
     "style-src 'self'",
     "script-src 'self'",
     "connect-src 'none'",
-    "font-src 'none'",
+    "font-src 'self'",
     "object-src 'none'",
     "media-src 'none'",
   ]) {
