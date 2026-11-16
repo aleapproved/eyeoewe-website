@@ -47,9 +47,7 @@ For user-facing changes, serve `public/` locally and obtain product-owner
 visual review at mobile and desktop sizes. Record visual review separately
 from automated checks.
 
-When a file under `public/` changes, its `?v=` in `public/index.html` and
-`public/join/index.html` must become the first 8 hex characters of its new
-SHA-256; `npm test` names the expected value when it does not match.
+A same-origin file referenced from a page or stylesheet carries `?v=` set to the first 8 hex characters of its SHA-256; `npm test` names the value. A changed font also changes `styles.css`'s hash.
 
 Before requesting a PR, run from the task worktree:
 
