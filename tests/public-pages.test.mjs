@@ -185,7 +185,7 @@ test('serves one install page for every invitation link, rewritten not redirecte
     redirectSources.some((source) => redirectSourceMatches(source, '/.well-known/assetlinks.json')),
     false,
   );
-  assert.match(joinText, /You’ve been invited to a group on Eye O Ewe/);
+  assert.match(joinText, /You’ve been invited to a group on Eye&nbsp;O&nbsp;Ewe/);
   assert.match(joinBody, /class="brand-mark" src="\/app-icon\.webp"/);
 });
 
@@ -199,22 +199,22 @@ test('says what to do on every platform, and shows the Join button only when the
   assert.match(
     joinBody,
     new RegExp(
-      `<p class="note" id="note-join" hidden>Don’t have the app yet\\? <a id="install-join" href="${installUrl}">Install Eye O Ewe</a>, then come back to this page and tap Join the group\\.</p>`,
+      `<p class="note" id="note-join" hidden>Don’t have the app yet\\? <a id="install-join" href="${installUrl}">Install Eye&nbsp;O&nbsp;Ewe</a>, then come back to this page and tap Join the group\\.</p>`,
     ),
   );
   assert.match(
     joinBody,
     new RegExp(
-      `<p class="note" id="note-install"><a id="install" href="${installUrl}">Install Eye O Ewe</a>, then tap your invitation link again\\.</p>`,
+      `<p class="note" id="note-install"><a id="install" href="${installUrl}">Install Eye&nbsp;O&nbsp;Ewe</a>, then tap your invitation link again\\.</p>`,
     ),
   );
   assert.match(
     joinBody,
     new RegExp(
-      `<p class="note" id="note-webview" hidden>To join, open this page in your browser\\. Don’t have the app yet\\? <a id="install-webview" href="${installUrl}">Install Eye O Ewe</a> first\\.</p>`,
+      `<p class="note" id="note-webview" hidden>To join, open this page in your browser\\. Don’t have the app yet\\? <a id="install-webview" href="${installUrl}">Install Eye&nbsp;O&nbsp;Ewe</a> first\\.</p>`,
     ),
   );
-  assert.match(joinBody, /<p class="note" id="note-no-app" hidden>Eye O Ewe isn’t on iPhone yet\.<\/p>/);
+  assert.match(joinBody, /<p class="note" id="note-no-app" hidden>Eye&nbsp;O&nbsp;Ewe isn’t on iPhone yet\.<\/p>/);
   assert.match(joinBody, /<p class="note" id="note-computer" hidden>Open this invitation on your phone\.<\/p>/);
   assert.match(styles, /\[hidden\] \{\n  display: none !important;\n\}/);
   assert.ok(exists('public/open-invitation.js'));
@@ -283,6 +283,22 @@ test('self-hosts small Roboto and Noto Serif fonts with their licences', () => {
   assert.ok(exists('public/fonts/OFL-NotoSerif.txt'));
   assert.match(read('public/fonts/OFL-Roboto.txt'), /SIL OPEN FONT LICENSE/);
   assert.match(read('public/fonts/OFL-NotoSerif.txt'), /SIL OPEN FONT LICENSE/);
+});
+
+test('the visible name Eye O Ewe never breaks across lines', () => {
+  for (const html of [root, read('public/join/index.html')]) {
+    const visible = html
+      .slice(html.indexOf('<body>'), html.indexOf('</body>'))
+      .replace(/<(script|style)\b[\s\S]*?<\/\1>/g, '')
+      .replace(/<[^>]*>/g, ' ');
+    assert.ok(visible.includes('Eye&nbsp;O&nbsp;Ewe'));
+    assert.doesNotMatch(visible, /Eye\s+O\s+Ewe/);
+    assert.doesNotMatch(visible, /Eye&nbsp;O (?:&nbsp;)?Ewe|Eye O&nbsp;Ewe/);
+  }
+});
+
+test('headings wrap into even lines', () => {
+  assert.match(styles, /h1,\s*h2 \{[^}]*text-wrap: balance/);
 });
 
 test('serves restrictive headers compatible with this static page', () => {
