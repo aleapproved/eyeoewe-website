@@ -49,8 +49,12 @@ test('publishes the short branded homepage with the approved copy only', () => {
   assert.match(bodyText, /Split bills with friends, privately\./);
   assert.match(
     bodyText,
-    /Your expenses are encrypted, so only your group can see them\. Most apps can see everything you add\./,
+    /End-to-end encrypted Only your group can see your expenses\. Most apps can see everything you add\. Free and ad-free There’s no limit on how many expenses you can add\./,
   );
+  assert.doesNotMatch(bodyText, /Your expenses are encrypted, so only/);
+  assert.match(root, /<h1\b[^>]*>Split bills with friends, privately\.<\/h1>\s*<\/section>\s*<section class="point"[^>]*>\s*<h2[^>]*>End-to-end encrypted<\/h2>/);
+  assert.match(root, /content="Split bills with friends, privately\. Only your group can see your expenses\."/);
+  assert.ok(root.indexOf('Free and ad-free') < root.indexOf('google-play-badge.png'));
   assert.match(bodyText, /Free and ad-free/);
   assert.match(bodyText, /There’s no limit on how many expenses you can add\./);
   assert.doesNotMatch(bodyText, /Invite-only|Install from Google Play|Simple\. Free\. Encrypted\.|Shared expenses/);
@@ -59,7 +63,7 @@ test('publishes the short branded homepage with the approved copy only', () => {
   assert.match(root, /og:image.*social-preview\.jpg/);
   assert.match(root, /twitter:image.*social-preview\.jpg/);
   assert.doesNotMatch(root, /<nav\b|<form\b|<input\b|<ul\b|<ol\b/);
-  assert.doesNotMatch(root, /Free forever|End-to-end encrypted|feature grid|testimonial/i);
+  assert.doesNotMatch(root, /Free forever|feature grid|testimonial/i);
   for (const file of ['app-icon.png', 'app-icon.webp', 'social-preview.jpg', 'favicon.png', 'styles.css', 'home.css', 'theme.js', 'google-play-badge.png']) {
     assert.ok(exists(`public/${file}`), `missing ${file}`);
   }

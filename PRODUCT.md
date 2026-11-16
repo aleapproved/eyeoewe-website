@@ -6,8 +6,8 @@ The product name is **Eye O Ewe**. The homepage is short, one or two phone
 screens, centred, in this order:
 
 - `Split bills with friends, privately.`
-- `Your expenses are encrypted, so only your group can see them. Most apps can
-  see everything you add.`
+- `End-to-end encrypted`, with `Only your group can see your expenses. Most
+  apps can see everything you add.`
 - `Free and ad-free`, with `There’s no limit on how many expenses you can add.`
 - Google's official `Get it on Google Play` badge, used as Google's badge
   guidelines require, linking to the Google Play internal testing opt-in so

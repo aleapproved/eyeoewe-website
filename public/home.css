@@ -1,7 +1,7 @@
 /* The homepage only: a centred column, then the screenshots. */
 
 .home-hero,
-.free,
+.point,
 .touch,
 .screens {
   width: 100%;
@@ -21,19 +21,18 @@
   line-height: 1.02;
 }
 
-.home-hero .tagline,
-.free p,
+.point p,
 .touch p {
   max-width: 34rem;
   margin-right: auto;
   margin-left: auto;
 }
 
-.free {
+.point {
   margin-top: clamp(2rem, 5vw, 3rem);
 }
 
-.free h2,
+.point h2,
 .touch h2 {
   margin: 0;
   font-size: clamp(1.5rem, 2.6vw, 1.9rem);
@@ -42,7 +41,7 @@
   line-height: 1.1;
 }
 
-.free p,
+.point p,
 .touch p {
   margin-top: 0.75rem;
   margin-bottom: 0;
