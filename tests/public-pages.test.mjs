@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { resolve } from 'node:path';
+import { brotliDecompressSync } from 'node:zlib';
 
 const read = (relativePath) => readFileSync(resolve(process.cwd(), relativePath), 'utf8');
 const exists = (relativePath) => existsSync(resolve(process.cwd(), relativePath));
@@ -49,17 +50,20 @@ test('publishes the short branded homepage with the approved copy only', () => {
   assert.match(bodyText, /Split bills with friends, privately\./);
   assert.match(
     bodyText,
-    /Your expenses are encrypted, so only your group can see them\. Most apps can see everything you add\./,
+    /End-to-end encrypted\. Only your group can see your expenses\. Free\. And ad-free\. Unlimited expenses\. No distractions\./,
   );
-  assert.match(bodyText, /Free and ad-free/);
-  assert.match(bodyText, /There’s no limit on how many expenses you can add\./);
+  assert.doesNotMatch(bodyText, /Your expenses are encrypted, so only/);
+  assert.match(root, /<h1\b[^>]*>Split bills with friends, privately\.<\/h1>\s*<\/section>\s*<section class="point"[^>]*>\s*<h2[^>]*>End-to-end encrypted\.<\/h2>/);
+  assert.match(root, /content="Split bills with friends, privately\. Only your group can see your expenses\."/);
+  assert.ok(root.indexOf('Free. And ad-free.') < root.indexOf('google-play-badge.png'));
+  assert.doesNotMatch(bodyText, /Most apps can see|no limit on how many/);
   assert.doesNotMatch(bodyText, /Invite-only|Install from Google Play|Simple\. Free\. Encrypted\.|Shared expenses/);
   assert.match(root, /<img class="brand-mark" src="\/app-icon\.webp"[^>]+width="44"[^>]+height="44"/);
   assert.match(root, /<link rel="icon" type="image\/png" sizes="64x64" href="\/favicon\.png"/);
   assert.match(root, /og:image.*social-preview\.jpg/);
   assert.match(root, /twitter:image.*social-preview\.jpg/);
   assert.doesNotMatch(root, /<nav\b|<form\b|<input\b|<ul\b|<ol\b/);
-  assert.doesNotMatch(root, /Free forever|End-to-end encrypted|feature grid|testimonial/i);
+  assert.doesNotMatch(root, /Free forever|feature grid|testimonial/i);
   for (const file of ['app-icon.png', 'app-icon.webp', 'social-preview.jpg', 'favicon.png', 'styles.css', 'home.css', 'theme.js', 'google-play-badge.png']) {
     assert.ok(exists(`public/${file}`), `missing ${file}`);
   }
@@ -92,16 +96,16 @@ test('keeps the two screenshots side by side at every width', () => {
 test('shows the real app screens for the theme in force, with one alt text at a time', () => {
   const images = root.match(/<img class="shot-img[^>]*>/g) ?? [];
   assert.equal(images.length, 4);
-  const group = 'alt="A group’s balances in Eye O Ewe"';
+  const group = 'alt="A group in Eye O Ewe, with its balance and recent expenses"';
   const expense = 'alt="Adding an expense in Eye O Ewe"';
   const expected = [
-    ['shot-light', 'group-light.webp', group],
-    ['shot-dark', 'group-dark.webp', group],
+    ['shot-light', 'group-page-light.webp', group],
+    ['shot-dark', 'group-page-dark.webp', group],
     ['shot-light', 'expense-light.webp', expense],
     ['shot-dark', 'expense-dark.webp', expense],
   ];
   expected.forEach(([theme, file, alt], i) => {
-    assert.match(images[i], new RegExp(`class="shot-img ${theme}" loading="lazy" src="/${file}" width="816" height="1813" ${alt}`));
+    assert.match(images[i], new RegExp(`class="shot-img ${theme}" loading="lazy" src="/${file}" width="816" height="1766" ${alt}`));
     assert.ok(exists(`public/${file}`), file);
   });
   assert.doesNotMatch(root, /placeholder/i);
@@ -185,7 +189,7 @@ test('serves one install page for every invitation link, rewritten not redirecte
     redirectSources.some((source) => redirectSourceMatches(source, '/.well-known/assetlinks.json')),
     false,
   );
-  assert.match(joinText, /You’ve been invited to a group on Eye O Ewe/);
+  assert.match(joinText, /You’ve been invited to a group on Eye&nbsp;O&nbsp;Ewe/);
   assert.match(joinBody, /class="brand-mark" src="\/app-icon\.webp"/);
 });
 
@@ -199,22 +203,22 @@ test('says what to do on every platform, and shows the Join button only when the
   assert.match(
     joinBody,
     new RegExp(
-      `<p class="note" id="note-join" hidden>Don’t have the app yet\\? <a id="install-join" href="${installUrl}">Install Eye O Ewe</a>, then come back to this page and tap Join the group\\.</p>`,
+      `<p class="note" id="note-join" hidden>Don’t have the app yet\\? <a id="install-join" href="${installUrl}">Install Eye&nbsp;O&nbsp;Ewe</a>, then come back to this page and tap Join the group\\.</p>`,
     ),
   );
   assert.match(
     joinBody,
     new RegExp(
-      `<p class="note" id="note-install"><a id="install" href="${installUrl}">Install Eye O Ewe</a>, then tap your invitation link again\\.</p>`,
+      `<p class="note" id="note-install"><a id="install" href="${installUrl}">Install Eye&nbsp;O&nbsp;Ewe</a>, then tap your invitation link again\\.</p>`,
     ),
   );
   assert.match(
     joinBody,
     new RegExp(
-      `<p class="note" id="note-webview" hidden>To join, open this page in your browser\\. Don’t have the app yet\\? <a id="install-webview" href="${installUrl}">Install Eye O Ewe</a> first\\.</p>`,
+      `<p class="note" id="note-webview" hidden>To join, open this page in your browser\\. Don’t have the app yet\\? <a id="install-webview" href="${installUrl}">Install Eye&nbsp;O&nbsp;Ewe</a> first\\.</p>`,
     ),
   );
-  assert.match(joinBody, /<p class="note" id="note-no-app" hidden>Eye O Ewe isn’t on iPhone yet\.<\/p>/);
+  assert.match(joinBody, /<p class="note" id="note-no-app" hidden>Eye&nbsp;O&nbsp;Ewe isn’t on iPhone yet\.<\/p>/);
   assert.match(joinBody, /<p class="note" id="note-computer" hidden>Open this invitation on your phone\.<\/p>/);
   assert.match(styles, /\[hidden\] \{\n  display: none !important;\n\}/);
   assert.ok(exists('public/open-invitation.js'));
@@ -249,13 +253,176 @@ test('uses the mobile app visual language with responsive, accessible styling', 
   ]) {
     assert.match(styles, new RegExp(color));
   }
-  assert.match(styles, /Georgia, "Times New Roman", serif/);
+  assert.doesNotMatch(styles + home, /Georgia|Times New Roman|--display/);
   assert.match(styles, /\.brand:focus-visible/);
   assert.match(styles, /@media \(max-width: 820px\)/);
   assert.match(styles, /@media \(max-width: 420px\)/);
   assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/);
   assert.doesNotMatch(styles, /\.hero-visual/);
   assert.doesNotMatch(styles, /\.status-dot/);
+});
+
+// The characters a woff2 font can draw: its cmap table (never transformed in woff2).
+function woff2Characters(file) {
+  const buf = readFileSync(resolve(process.cwd(), file));
+  assert.equal(buf.toString('latin1', 0, 4), 'wOF2');
+  const numTables = buf.readUInt16BE(12);
+  const compressedSize = buf.readUInt32BE(20);
+  let pos = 48;
+  const readBase128 = () => {
+    let value = 0;
+    for (let i = 0; i < 5; i++) {
+      const byte = buf[pos++];
+      value = value * 128 + (byte & 0x7f);
+      if (!(byte & 0x80)) return value;
+    }
+    throw new Error('bad UIntBase128');
+  };
+  const tables = [];
+  for (let i = 0; i < numTables; i++) {
+    const flags = buf[pos++];
+    const index = flags & 0x3f;
+    const version = flags >> 6;
+    let tag;
+    if (index === 63) {
+      tag = buf.toString('latin1', pos, pos + 4);
+      pos += 4;
+    } else {
+      tag = WOFF2_TAGS[index];
+    }
+    const length = readBase128();
+    const transformed = tag === 'glyf' || tag === 'loca' ? version === 0 : version !== 0;
+    tables.push({ tag, size: transformed ? readBase128() : length });
+  }
+  const data = brotliDecompressSync(buf.subarray(pos, pos + compressedSize));
+  let offset = 0;
+  let cmap;
+  for (const table of tables) {
+    if (table.tag === 'cmap') cmap = data.subarray(offset, offset + table.size);
+    offset += table.size;
+  }
+  assert.ok(cmap, 'no cmap table in ' + file);
+  const characters = new Set();
+  const subtables = cmap.readUInt16BE(2);
+  for (let i = 0; i < subtables; i++) {
+    const sub = cmap.readUInt32BE(4 + i * 8 + 4);
+    const format = cmap.readUInt16BE(sub);
+    if (format === 4) {
+      const segments = cmap.readUInt16BE(sub + 6) / 2;
+      const ends = sub + 14;
+      const starts = ends + segments * 2 + 2;
+      const deltas = starts + segments * 2;
+      const rangeOffsets = deltas + segments * 2;
+      for (let seg = 0; seg < segments; seg++) {
+        const start = cmap.readUInt16BE(starts + seg * 2);
+        const end = cmap.readUInt16BE(ends + seg * 2);
+        const delta = cmap.readUInt16BE(deltas + seg * 2);
+        const rangeOffset = cmap.readUInt16BE(rangeOffsets + seg * 2);
+        for (let code = start; code <= end && code < 0xffff; code++) {
+          const glyph = rangeOffset
+            ? cmap.readUInt16BE(rangeOffsets + seg * 2 + rangeOffset + (code - start) * 2)
+            : code + delta;
+          if (rangeOffset ? glyph !== 0 : (glyph & 0xffff) !== 0) characters.add(String.fromCodePoint(code));
+        }
+      }
+    } else if (format === 12) {
+      const groups = cmap.readUInt32BE(sub + 12);
+      for (let g = 0; g < groups; g++) {
+        const start = cmap.readUInt32BE(sub + 16 + g * 12);
+        const end = cmap.readUInt32BE(sub + 20 + g * 12);
+        for (let code = start; code <= end; code++) characters.add(String.fromCodePoint(code));
+      }
+    }
+  }
+  return characters;
+}
+const WOFF2_TAGS = ['cmap', 'head', 'hhea', 'hmtx', 'maxp', 'name', 'OS/2', 'post', 'cvt ', 'fpgm', 'glyf', 'loca', 'prep', 'CFF ', 'VORG', 'EBDT', 'EBLC', 'gasp', 'hdmx', 'kern', 'LTSH', 'PCLT', 'VDMX', 'vhea', 'vmtx', 'BASE', 'GDEF', 'GPOS', 'GSUB', 'EBSC', 'JSTF', 'MATH', 'CBDT', 'CBLC', 'COLR', 'CPAL', 'SVG ', 'sbix', 'acnt', 'avar', 'bdat', 'bloc', 'bsln', 'cvar', 'fdsc', 'feat', 'fmtx', 'fvar', 'gvar', 'hsty', 'just', 'lcar', 'mort', 'morx', 'opbd', 'prop', 'trak', 'Zapf', 'Silf', 'Glat', 'Gloc', 'Feat', 'Sill'];
+
+const decodeEntities = (text) =>
+  text
+    .replace(/&nbsp;/g, '\u00a0')
+    .replace(/&amp;/g, '&')
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)));
+const visibleText = (html) =>
+  decodeEntities(
+    html
+      .slice(html.indexOf('<body>'), html.indexOf('</body>'))
+      .replace(/<(script|style)\b[\s\S]*?<\/\1>/g, '')
+      .replace(/<[^>]*>/g, ' '),
+  );
+const missingFrom = (characters, text) => [...new Set(text)].filter((c) => !/[\n\r\t]/.test(c) && !characters.has(c));
+
+test('the Roboto and Noto Serif subsets cover every character the pages and scripts show', () => {
+  const roboto = woff2Characters('public/fonts/Roboto-400Regular.woff2');
+  const pages = [root, read('public/join/index.html')];
+  let text = pages.map(visibleText).join('');
+  for (const script of ['public/theme.js', 'public/open-invitation.js']) {
+    for (const literal of read(script).matchAll(/'((?:[^'\\\n]|\\.)*)'|"((?:[^"\\\n]|\\.)*)"|`((?:[^`\\]|\\.)*)`/g)) {
+      text += literal[1] ?? literal[2] ?? literal[3];
+    }
+  }
+  assert.ok(text.includes('’') && text.includes('\u00a0'));
+  assert.deepEqual(missingFrom(roboto, text), []);
+  const serif = woff2Characters('public/fonts/NotoSerif-400Regular.woff2');
+  const wordmark = pages.map((html) => decodeEntities(html.match(/<span>(Eye&nbsp;O&nbsp;Ewe)<\/span>/)[1])).join('');
+  assert.deepEqual(missingFrom(serif, wordmark), []);
+});
+
+test('self-hosts small Roboto and Noto Serif fonts with their licences', () => {
+  const fonts = [
+    ['Roboto-400Regular.woff2', 40000],
+    ['Roboto-600SemiBold.woff2', 40000],
+    ['Roboto-700Bold.woff2', 40000],
+    ['NotoSerif-400Regular.woff2', 10000],
+  ];
+  let total = 0;
+  for (const [name, ceiling] of fonts) {
+    const file = resolve(process.cwd(), 'public/fonts', name);
+    assert.ok(existsSync(file), name + ' is missing');
+    const bytes = readFileSync(file);
+    assert.equal(bytes.subarray(0, 4).toString('latin1'), 'wOF2');
+    assert.ok(bytes.length < ceiling, name + ' is too big: ' + bytes.length);
+    total += bytes.length;
+    assert.ok(styles.includes('url("/fonts/' + name + '")'), name + ' is not in @font-face');
+  }
+  assert.ok(total < 120000);
+  assert.equal(styles.match(/font-display: swap;/g).length, fonts.length);
+  assert.match(styles, /font-family:\s*"Roboto", -apple-system/);
+  assert.match(styles, /\.brand span \{[^}]*"Noto Serif"/);
+  assert.ok(exists('public/fonts/OFL-Roboto.txt'));
+  assert.ok(exists('public/fonts/OFL-NotoSerif.txt'));
+  assert.match(read('public/fonts/OFL-Roboto.txt'), /SIL OPEN FONT LICENSE/);
+  assert.match(read('public/fonts/OFL-NotoSerif.txt'), /SIL OPEN FONT LICENSE/);
+});
+
+test('the visible name Eye O Ewe never breaks across lines', () => {
+  for (const html of [root, read('public/join/index.html')]) {
+    const visible = html
+      .slice(html.indexOf('<body>'), html.indexOf('</body>'))
+      .replace(/<(script|style)\b[\s\S]*?<\/\1>/g, '')
+      .replace(/<[^>]*>/g, ' ');
+    assert.ok(visible.includes('Eye&nbsp;O&nbsp;Ewe'));
+    assert.doesNotMatch(visible, /Eye\s+O\s+Ewe/);
+    assert.doesNotMatch(visible, /Eye&nbsp;O (?:&nbsp;)?Ewe|Eye O&nbsp;Ewe/);
+  }
+});
+
+test('turns off the browser tap highlight and gives pressed states of its own', () => {
+  assert.match(styles, /\* \{[^}]*-webkit-tap-highlight-color: transparent;/);
+  assert.match(styles, /\.theme-toggle:active \{[^}]*background: var\(--line\)/);
+  assert.match(styles, /a:active \{[^}]*opacity/);
+});
+
+test('the toggle icon shows the current mode: sun in light, moon in dark', () => {
+  assert.match(styles, /:root \{\s*--toggle-moon: none;\s*--toggle-sun: block;\s*\}/);
+  assert.match(styles, /:root:not\(\[data-theme="light"\]\) \{[^}]*--toggle-moon: block;\s*--toggle-sun: none;/);
+  assert.match(styles, /:root\[data-theme="dark"\] \{[^}]*--toggle-moon: block;\s*--toggle-sun: none;/);
+  assert.doesNotMatch(styles, /:root\[data-theme="light"\] \{[^}]*--toggle/);
+});
+
+test('headings wrap into even lines', () => {
+  assert.match(styles, /h1,\s*h2 \{[^}]*text-wrap: balance/);
 });
 
 test('serves restrictive headers compatible with this static page', () => {
@@ -269,7 +436,7 @@ test('serves restrictive headers compatible with this static page', () => {
     "style-src 'self'",
     "script-src 'self'",
     "connect-src 'none'",
-    "font-src 'none'",
+    "font-src 'self'",
     "object-src 'none'",
     "media-src 'none'",
   ]) {
@@ -318,7 +485,7 @@ test('defines the durable website documentation model and product boundary', () 
   for (const copy of [
     'Eye O Ewe',
     'Split bills with friends, privately\\.',
-    'Free and ad-free',
+    'Free\\. And ad-free\\.',
   ]) {
     assert.match(product, new RegExp(copy));
   }

@@ -63,6 +63,21 @@ Review the complete diff, confirm the issue scope, and record unavailable
 checks explicitly. Local checks do not prove a GitHub merge, a Pages
 deployment, or a live response.
 
+## Fonts
+
+The site self-hosts Roboto (400, 600, 700) and Noto Serif (400, the header
+wordmark only) from `public/fonts/`, taken from the app's
+`@expo-google-fonts` packages with their SIL Open Font Licence texts. To redo
+the subsets (`fontTools` with `brotli`):
+
+```bash
+python3 -m fontTools.subset Roboto_<weight>.ttf --flavor=woff2 --layout-features='*' \
+  --unicodes="U+0000-00FF,U+2013,U+2014,U+2018,U+2019,U+201C,U+201D,U+2026,U+20AC,U+2022" \
+  --output-file=public/fonts/Roboto-<weight>.woff2
+python3 -m fontTools.subset NotoSerif_400Regular.ttf --flavor=woff2 --layout-features='*' \
+  --text=$'Eye O Ewe\u00a0' --output-file=public/fonts/NotoSerif-400Regular.woff2
+```
+
 ## Pull requests and `main`
 
 Ask the owner before pushing or opening or updating a PR. The PR must link the
