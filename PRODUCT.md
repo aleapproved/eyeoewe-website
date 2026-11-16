@@ -17,7 +17,6 @@ screens, centred, in this order:
   an expense. The page shows the light or the dark screens for the theme in
   force.
 - `Get in touch`, with `Questions or ideas? Email hello@eyeoewe.app`.
-- A footer with the support email.
 
 The whole site, the invitation page too, follows the phone's light or dark
 setting. A small toggle in the header overrides it and remembers the choice on

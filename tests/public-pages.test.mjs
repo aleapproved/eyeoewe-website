@@ -68,7 +68,7 @@ test('publishes the short branded homepage with the approved copy only', () => {
   assert.ok(!exists('public/eyeoewe'));
 });
 
-test('links the Google Play badge to the install link, with the footer links after the content', () => {
+test('links the Google Play badge to the install link, with the content in order', () => {
   assert.match(
     root,
     new RegExp(`<a href="${installUrl}"><img src="/google-play-badge\\.png" alt="Get it on Google Play" width="646" height="250" /></a>`),
@@ -78,12 +78,9 @@ test('links the Google Play badge to the install link, with the footer links aft
     createHash('sha256').update(readFileSync(resolve(process.cwd(), 'public/google-play-badge.png'))).digest('hex'),
     'f72611e2df8e88204009fd896d05d5e8e83c77009c63943bbffa169559934849',
   );
-  const order = ['hero-title', 'free-title', 'google-play-badge.png', 'class="screens"', 'touch-title', '<footer'].map((marker) => root.indexOf(marker));
+  const order = ['hero-title', 'free-title', 'google-play-badge.png', 'class="screens"', 'touch-title'].map((marker) => root.indexOf(marker));
   assert.deepEqual(order, [...order].sort((a, b) => a - b));
   assert.ok(!order.includes(-1));
-  const footer = root.slice(root.indexOf('<footer'), root.indexOf('</footer>'));
-  assert.match(footer, /href="mailto:hello@eyeoewe\.app"/);
-  assert.doesNotMatch(footer, /privacy/i);
 });
 
 test('keeps the two screenshots side by side at every width', () => {

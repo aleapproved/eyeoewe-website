@@ -123,16 +123,3 @@
 .touch {
   margin-top: clamp(3.5rem, 9vw, 6.5rem);
 }
-
-.site-footer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.75rem;
-  width: 100%;
-  max-width: 1120px;
-  margin: clamp(4rem, 10vw, 7rem) auto 0;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 0.94rem;
-}
