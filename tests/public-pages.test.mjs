@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { test } from 'node:test';
 import { resolve } from 'node:path';
 import { brotliDecompressSync } from 'node:zlib';
@@ -58,8 +58,8 @@ test('publishes the short branded homepage with the approved copy only', () => {
   assert.ok(root.indexOf('Free. And ad-free.') < root.indexOf('google-play-badge.png'));
   assert.doesNotMatch(bodyText, /Most apps can see|no limit on how many/);
   assert.doesNotMatch(bodyText, /Invite-only|Install from Google Play|Simple\. Free\. Encrypted\.|Shared expenses/);
-  assert.match(root, /<img class="brand-mark" src="\/app-icon\.webp"[^>]+width="44"[^>]+height="44"/);
-  assert.match(root, /<link rel="icon" type="image\/png" sizes="64x64" href="\/favicon\.png"/);
+  assert.match(root, /<img class="brand-mark" src="\/app-icon\.webp\?v=[0-9a-f]{8}"[^>]+width="44"[^>]+height="44"/);
+  assert.match(root, /<link rel="icon" type="image\/png" sizes="64x64" href="\/favicon\.png\?v=[0-9a-f]{8}"/);
   assert.match(root, /og:image.*social-preview\.jpg/);
   assert.match(root, /twitter:image.*social-preview\.jpg/);
   assert.doesNotMatch(root, /<nav\b|<form\b|<input\b|<ul\b|<ol\b/);
@@ -75,7 +75,7 @@ test('publishes the short branded homepage with the approved copy only', () => {
 test('links the Google Play badge to the install link, with the content in order', () => {
   assert.match(
     root,
-    new RegExp(`<a href="${installUrl}"><img src="/google-play-badge\\.png" alt="Get it on Google Play" width="646" height="250" /></a>`),
+    new RegExp(`<a href="${installUrl}"><img src="/google-play-badge\\.png\\?v=[0-9a-f]{8}" alt="Get it on Google Play" width="646" height="250" /></a>`),
   );
   // Google's artwork, unaltered: any change to the file must be deliberate.
   assert.equal(
@@ -105,7 +105,7 @@ test('shows the real app screens for the theme in force, with one alt text at a 
     ['shot-dark', 'expense-dark.webp', expense],
   ];
   expected.forEach(([theme, file, alt], i) => {
-    assert.match(images[i], new RegExp(`class="shot-img ${theme}" loading="lazy" src="/${file}" width="816" height="1766" ${alt}`));
+    assert.match(images[i], new RegExp(`class="shot-img ${theme}" loading="lazy" src="/${file}\\?v=[0-9a-f]{8}" width="816" height="1766" ${alt}`));
     assert.ok(exists(`public/${file}`), file);
   });
   assert.doesNotMatch(root, /placeholder/i);
@@ -124,18 +124,18 @@ test('keeps the dark palette identical in both blocks, the browser-bar colours a
   assert.match(root, /<meta name="theme-color" content="#FAF8F6" media="\(prefers-color-scheme: light\)" \/>/);
   assert.match(root, /<meta name="theme-color" content="#0D1925" media="\(prefers-color-scheme: dark\)" \/>/);
   const head = root.slice(root.indexOf('<head>'), root.indexOf('</head>'));
-  assert.match(head, /<script src="\/theme\.js\?v=1"><\/script>/);
+  assert.match(head, /<script src="\/theme\.js\?v=[0-9a-f]{8}"><\/script>/);
 });
 
 test('follows the phone theme with a toggle that remembers the choice, from a same-origin script', () => {
   assert.match(root, /<meta name="color-scheme" content="light dark" \/>/);
-  assert.deepEqual(root.match(/<script\b[^>]*>/g), ['<script src="/theme.js?v=1">']);
+  assert.deepEqual(root.match(/<script\b[^>]*>/g).map((tag) => tag.replace(/\?v=[0-9a-f]{8}/, '')), ['<script src="/theme.js">']);
   assert.match(root, /<button class="theme-toggle" id="theme-toggle" type="button"[^>]* hidden>/);
   assert.match(styles, /@media \(prefers-color-scheme: dark\) \{\n  :root:not\(\[data-theme="light"\]\)/);
   for (const dark of ['#0D1925', '#14222F', '#E8EEF5', '#A2B2C2']) assert.ok(styles.includes(dark), dark);
   assert.match(root, /<meta name="color-scheme" content="light dark" \/>/);
   assert.match(join, /<meta name="color-scheme" content="light dark" \/>/);
-  assert.match(join, /<script src="\/theme\.js\?v=1"><\/script>/);
+  assert.match(join, /<script src="\/theme\.js\?v=[0-9a-f]{8}"><\/script>/);
   assert.match(join, /<button class="theme-toggle" id="theme-toggle" type="button"[^>]* hidden>/);
   // Without the script the toggle stays hidden: its display must not override the hidden attribute.
   assert.match(styles, /\[hidden\] \{\n  display: none !important;\n\}/);
@@ -190,7 +190,7 @@ test('serves one install page for every invitation link, rewritten not redirecte
     false,
   );
   assert.match(joinText, /You’ve been invited to a group on Eye&nbsp;O&nbsp;Ewe/);
-  assert.match(joinBody, /class="brand-mark" src="\/app-icon\.webp"/);
+  assert.match(joinBody, /class="brand-mark" src="\/app-icon\.webp\?v=[0-9a-f]{8}"/);
 });
 
 test('says what to do on every platform, and shows the Join button only when the page script says so', () => {
@@ -232,8 +232,8 @@ test('links the homepage and the join page only to the Play internal testing opt
 
 test('keeps the invitation secret on the join page only', () => {
   // Both scripts are same-origin; tests/open-invitation.test.mjs pins that the invitation script sends nothing.
-  assert.deepEqual(join.match(/<script\b[^>]*>/g), ['<script src="/theme.js?v=1">', '<script src="/open-invitation.js?v=1">']);
-  assert.match(join, /<script src="\/open-invitation\.js\?v=1"><\/script>/);
+  assert.deepEqual(join.match(/<script\b[^>]*>/g).map((tag) => tag.replace(/\?v=[0-9a-f]{8}/, '')), ['<script src="/theme.js">', '<script src="/open-invitation.js">']);
+  assert.match(join, /<script src="\/open-invitation\.js\?v=[0-9a-f]{8}"><\/script>/);
   assert.doesNotMatch(join, /<form\b|<iframe\b|<img[^>]+src="https?:|<link[^>]+href="https?:/i);
   assert.doesNotMatch(join, /location|referrer|canonical|og:url|analytics/i);
   assert.match(headers, /^\/\*\n(?:  .+\n)*  Referrer-Policy: no-referrer$/m);
@@ -384,7 +384,7 @@ test('self-hosts small Roboto and Noto Serif fonts with their licences', () => {
     assert.equal(bytes.subarray(0, 4).toString('latin1'), 'wOF2');
     assert.ok(bytes.length < ceiling, name + ' is too big: ' + bytes.length);
     total += bytes.length;
-    assert.ok(styles.includes('url("/fonts/' + name + '")'), name + ' is not in @font-face');
+    assert.ok(styles.includes('url("/fonts/' + name + '?v='), name + ' is not in @font-face');
   }
   assert.ok(total < 120000);
   assert.equal(styles.match(/font-display: swap;/g).length, fonts.length);
@@ -536,4 +536,42 @@ test('keeps the PR template and local tooling boundary lightweight', () => {
     assert.match(pullRequestTemplate, new RegExp(`- ${field}:`));
   }
   assert.match(gitignore, /^\.wrangler\/$/m);
+});
+
+// A changed file needs a new URL, so every reference to a servable file in a page or stylesheet carries ?v=
+// set to the hash of its bytes. This test is the only one that checks the hash value.
+function walk(relative = '') {
+  return readdirSync(resolve(process.cwd(), 'public', relative), { withFileTypes: true }).flatMap((entry) => {
+    const path = relative ? `${relative}/${entry.name}` : entry.name;
+    if (entry.isDirectory()) return path === '.well-known' ? [] : walk(path);
+    return [path];
+  });
+}
+const allFiles = walk();
+const sources = allFiles.filter((path) => /\.(html|css)$/.test(path));
+const servable = allFiles.filter(
+  (path) => !/\.html$/.test(path) && !/^_(headers|redirects)$/.test(path) && !/^fonts\/OFL-.*\.txt$/.test(path),
+);
+const versionOf = (path) => createHash('sha256').update(readFileSync(resolve(process.cwd(), 'public', path))).digest('hex').slice(0, 8);
+
+test('versions every reference to a servable file with the hash of its bytes', () => {
+  const problems = [];
+  let references = 0;
+  for (const source of sources) {
+    const text = read(`public/${source}`);
+    for (const path of servable) {
+      const escaped = path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const pattern = new RegExp(`(?:(?<![\\w./-])/|https://eyeoewe\\.app/)${escaped}(?![\\w./-])`, 'g');
+      for (const match of text.matchAll(pattern)) {
+        references += 1;
+        const version = text.slice(match.index + match[0].length).match(/^\?v=([0-9a-f]{8})(?![0-9a-f])/);
+        const expected = versionOf(path);
+        if (!version || version[1] !== expected) {
+          problems.push(`${source}: ${match[0]} must carry ?v=${expected} (the first 8 hex characters of its SHA-256); set it to that value`);
+        }
+      }
+    }
+  }
+  assert.ok(references > 0, 'found no references to check');
+  assert.equal(problems.length, 0, problems.join('\n'));
 });
