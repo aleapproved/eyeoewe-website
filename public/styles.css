@@ -3,7 +3,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("/fonts/Roboto-400Regular.woff2") format("woff2");
+  src: url("/fonts/Roboto-400Regular.woff2?v=bb0cd72f") format("woff2");
 }
 
 @font-face {
@@ -11,7 +11,7 @@
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url("/fonts/Roboto-600SemiBold.woff2") format("woff2");
+  src: url("/fonts/Roboto-600SemiBold.woff2?v=00ae19a3") format("woff2");
 }
 
 @font-face {
@@ -19,7 +19,7 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("/fonts/Roboto-700Bold.woff2") format("woff2");
+  src: url("/fonts/Roboto-700Bold.woff2?v=c31464ab") format("woff2");
 }
 
 @font-face {
@@ -27,7 +27,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("/fonts/NotoSerif-400Regular.woff2") format("woff2");
+  src: url("/fonts/NotoSerif-400Regular.woff2?v=bf193972") format("woff2");
 }
 
 :root {

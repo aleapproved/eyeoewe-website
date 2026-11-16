@@ -384,7 +384,7 @@ test('self-hosts small Roboto and Noto Serif fonts with their licences', () => {
     assert.equal(bytes.subarray(0, 4).toString('latin1'), 'wOF2');
     assert.ok(bytes.length < ceiling, name + ' is too big: ' + bytes.length);
     total += bytes.length;
-    assert.ok(styles.includes('url("/fonts/' + name + '")'), name + ' is not in @font-face');
+    assert.ok(styles.includes('url("/fonts/' + name + '?v=' + createHash('sha256').update(bytes).digest('hex').slice(0, 8) + '")'), name + ' is not in @font-face with its hash');
   }
   assert.ok(total < 120000);
   assert.equal(styles.match(/font-display: swap;/g).length, fonts.length);
@@ -538,20 +538,27 @@ test('keeps the PR template and local tooling boundary lightweight', () => {
   assert.match(gitignore, /^\.wrangler\/$/m);
 });
 
-test('gives every same-origin asset a ?v= that is the hash of its current bytes', () => {
+function checkVersion(page, value) {
+  const [path, query = ''] = value.split('?');
+  const expected = createHash('sha256').update(readFileSync(resolve(process.cwd(), 'public', path.slice(1)))).digest('hex').slice(0, 8);
+  assert.equal(
+    query,
+    `v=${expected}`,
+    `${page}: ${path} must carry ?v=${expected} (the first 8 hex characters of its SHA-256); set it to that value`,
+  );
+}
+
+test('gives every same-origin asset and CSS url() a ?v= that is the hash of its current bytes', () => {
   // A browser caches assets for hours by URL, so a changed file needs a new URL: its ?v= must be its content hash.
   for (const page of ['public/index.html', 'public/join/index.html']) {
     const html = read(page);
     const assets = [...html.matchAll(/\b(?:src|href)="(\/[^"]*)"/g)].map((match) => match[1]).filter((value) => value !== '/');
     assert.ok(assets.length > 0, `${page} has no same-origin assets to check`);
     for (const value of assets) {
-      const [path, query = ''] = value.split('?');
-      const expected = createHash('sha256').update(readFileSync(resolve(process.cwd(), 'public', path.slice(1)))).digest('hex').slice(0, 8);
-      assert.equal(
-        query,
-        `v=${expected}`,
-        `${page}: ${path} must carry ?v=${expected} (the first 8 hex characters of its SHA-256); set it to that value`,
-      );
+      checkVersion(page, value);
     }
+  }
+  for (const sheet of ['public/styles.css', 'public/home.css']) {
+    for (const [, value] of read(sheet).matchAll(/url\("(\/[^"]*)"\)/g)) checkVersion(sheet, value);
   }
 });
