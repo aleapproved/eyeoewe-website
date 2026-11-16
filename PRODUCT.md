@@ -55,8 +55,9 @@ invited to a group on Eye O Ewe`. What follows depends on the visitor:
 `Install Eye O Ewe` links to the store for the visitor's platform; on Android
 that is the same Play link as the homepage's.
 
-The secret, the part after `#`, never reaches the server. The page's one
+The secret, the part after `#`, never reaches the server. The invitation
 script (`public/open-invitation.js`) reads it from the address and puts it only
-into that button's link; it stores nothing and sends nothing. The page has no
+into that button's link; it stores nothing and sends nothing. The theme script
+stores only the light or dark choice. The page has no
 redirect, analytics, or third-party content, and `Referrer-Policy: no-referrer`
 applies.

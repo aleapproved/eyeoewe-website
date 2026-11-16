@@ -95,13 +95,13 @@ test('shows the real app screens for the theme in force, with one alt text at a 
   const group = 'alt="A group’s balances in Eye O Ewe"';
   const expense = 'alt="Adding an expense in Eye O Ewe"';
   const expected = [
-    ['shot-light', 'group-light.png', group],
-    ['shot-dark', 'group-dark.png', group],
-    ['shot-light', 'expense-light.png', expense],
-    ['shot-dark', 'expense-dark.png', expense],
+    ['shot-light', 'group-light.webp', group],
+    ['shot-dark', 'group-dark.webp', group],
+    ['shot-light', 'expense-light.webp', expense],
+    ['shot-dark', 'expense-dark.webp', expense],
   ];
   expected.forEach(([theme, file, alt], i) => {
-    assert.match(images[i], new RegExp(`class="shot-img ${theme}" src="/${file}" width="1080" height="2400" ${alt}`));
+    assert.match(images[i], new RegExp(`class="shot-img ${theme}" loading="lazy" src="/${file}" width="816" height="1813" ${alt}`));
     assert.ok(exists(`public/${file}`), file);
   });
   assert.doesNotMatch(root, /placeholder/i);
@@ -112,6 +112,15 @@ test('shows the real app screens for the theme in force, with one alt text at a 
   assert.match(home, /:root\[data-theme="dark"\] \.shot-light \{\n  display: none;/);
   assert.match(root, /<h2 id="touch-title">Get in touch<\/h2>/);
   assert.match(root, /Questions or ideas\? Email <a href="mailto:hello@eyeoewe\.app">/);
+});
+
+test('keeps the dark palette identical in both blocks, the browser-bar colours and the early theme script', () => {
+  const block = (selector) => styles.slice(styles.indexOf(selector)).match(/\{([^}]*)\}/)[1].replace(/\s+/g, ' ').trim();
+  assert.equal(block(':root:not([data-theme="light"]) {'), block(':root[data-theme="dark"] {'));
+  assert.match(root, /<meta name="theme-color" content="#FAF8F6" media="\(prefers-color-scheme: light\)" \/>/);
+  assert.match(root, /<meta name="theme-color" content="#0D1925" media="\(prefers-color-scheme: dark\)" \/>/);
+  const head = root.slice(root.indexOf('<head>'), root.indexOf('</head>'));
+  assert.match(head, /<script src="\/theme\.js\?v=1"><\/script>/);
 });
 
 test('follows the phone theme with a toggle that remembers the choice, from a same-origin script', () => {
@@ -218,7 +227,7 @@ test('links the homepage and the join page only to the Play internal testing opt
 });
 
 test('keeps the invitation secret on the join page only', () => {
-  // The one script is same-origin; tests/open-invitation.test.mjs pins that it sends nothing.
+  // Both scripts are same-origin; tests/open-invitation.test.mjs pins that the invitation script sends nothing.
   assert.deepEqual(join.match(/<script\b[^>]*>/g), ['<script src="/theme.js?v=1">', '<script src="/open-invitation.js?v=1">']);
   assert.match(join, /<script src="\/open-invitation\.js\?v=1"><\/script>/);
   assert.doesNotMatch(join, /<form\b|<iframe\b|<img[^>]+src="https?:|<link[^>]+href="https?:/i);
