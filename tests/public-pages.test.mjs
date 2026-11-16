@@ -50,14 +50,13 @@ test('publishes the short branded homepage with the approved copy only', () => {
   assert.match(bodyText, /Split bills with friends, privately\./);
   assert.match(
     bodyText,
-    /End-to-end encrypted Only your group can see your expenses\. Most apps can see everything you add\. Free and ad-free There’s no limit on how many expenses you can add\./,
+    /End-to-end encrypted\. Only your group can see your expenses\. Free\. And ad-free\. Unlimited expenses\. No distractions\./,
   );
   assert.doesNotMatch(bodyText, /Your expenses are encrypted, so only/);
-  assert.match(root, /<h1\b[^>]*>Split bills with friends, privately\.<\/h1>\s*<\/section>\s*<section class="point"[^>]*>\s*<h2[^>]*>End-to-end encrypted<\/h2>/);
+  assert.match(root, /<h1\b[^>]*>Split bills with friends, privately\.<\/h1>\s*<\/section>\s*<section class="point"[^>]*>\s*<h2[^>]*>End-to-end encrypted\.<\/h2>/);
   assert.match(root, /content="Split bills with friends, privately\. Only your group can see your expenses\."/);
-  assert.ok(root.indexOf('Free and ad-free') < root.indexOf('google-play-badge.png'));
-  assert.match(bodyText, /Free and ad-free/);
-  assert.match(bodyText, /There’s no limit on how many expenses you can add\./);
+  assert.ok(root.indexOf('Free. And ad-free.') < root.indexOf('google-play-badge.png'));
+  assert.doesNotMatch(bodyText, /Most apps can see|no limit on how many/);
   assert.doesNotMatch(bodyText, /Invite-only|Install from Google Play|Simple\. Free\. Encrypted\.|Shared expenses/);
   assert.match(root, /<img class="brand-mark" src="\/app-icon\.webp"[^>]+width="44"[^>]+height="44"/);
   assert.match(root, /<link rel="icon" type="image\/png" sizes="64x64" href="\/favicon\.png"/);
@@ -486,7 +485,7 @@ test('defines the durable website documentation model and product boundary', () 
   for (const copy of [
     'Eye O Ewe',
     'Split bills with friends, privately\\.',
-    'Free and ad-free',
+    'Free\\. And ad-free\\.',
   ]) {
     assert.match(product, new RegExp(copy));
   }
