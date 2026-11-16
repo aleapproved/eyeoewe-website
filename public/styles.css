@@ -90,8 +90,8 @@ img {
    (html[data-theme], set by theme.js). */
 
 :root {
-  --toggle-moon: block;
-  --toggle-sun: none;
+  --toggle-moon: none;
+  --toggle-sun: block;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -103,8 +103,8 @@ img {
     --muted: #A2B2C2;
     --line: #2A3C4F;
     --line-strong: #3A4F64;
-    --toggle-moon: none;
-    --toggle-sun: block;
+    --toggle-moon: block;
+    --toggle-sun: none;
   }
 }
 
@@ -116,8 +116,8 @@ img {
   --muted: #A2B2C2;
   --line: #2A3C4F;
   --line-strong: #3A4F64;
-  --toggle-moon: none;
-  --toggle-sun: block;
+  --toggle-moon: block;
+  --toggle-sun: none;
 }
 
 :root[data-theme="light"] {

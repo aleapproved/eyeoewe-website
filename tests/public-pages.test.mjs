@@ -303,6 +303,13 @@ test('turns off the browser tap highlight and gives pressed states of its own', 
   assert.match(styles, /a:active \{[^}]*opacity/);
 });
 
+test('the toggle icon shows the current mode: sun in light, moon in dark', () => {
+  assert.match(styles, /:root \{\s*--toggle-moon: none;\s*--toggle-sun: block;\s*\}/);
+  assert.match(styles, /:root:not\(\[data-theme="light"\]\) \{[^}]*--toggle-moon: block;\s*--toggle-sun: none;/);
+  assert.match(styles, /:root\[data-theme="dark"\] \{[^}]*--toggle-moon: block;\s*--toggle-sun: none;/);
+  assert.doesNotMatch(styles, /:root\[data-theme="light"\] \{[^}]*--toggle/);
+});
+
 test('headings wrap into even lines', () => {
   assert.match(styles, /h1,\s*h2 \{[^}]*text-wrap: balance/);
 });
