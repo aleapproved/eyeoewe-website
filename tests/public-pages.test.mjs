@@ -96,16 +96,16 @@ test('keeps the two screenshots side by side at every width', () => {
 test('shows the real app screens for the theme in force, with one alt text at a time', () => {
   const images = root.match(/<img class="shot-img[^>]*>/g) ?? [];
   assert.equal(images.length, 4);
-  const group = 'alt="A group’s balances in Eye O Ewe"';
+  const group = 'alt="A group in Eye O Ewe, with its balance and recent expenses"';
   const expense = 'alt="Adding an expense in Eye O Ewe"';
   const expected = [
-    ['shot-light', 'group-light.webp', group],
-    ['shot-dark', 'group-dark.webp', group],
+    ['shot-light', 'group-page-light.webp', group],
+    ['shot-dark', 'group-page-dark.webp', group],
     ['shot-light', 'expense-light.webp', expense],
     ['shot-dark', 'expense-dark.webp', expense],
   ];
   expected.forEach(([theme, file, alt], i) => {
-    assert.match(images[i], new RegExp(`class="shot-img ${theme}" loading="lazy" src="/${file}" width="816" height="1813" ${alt}`));
+    assert.match(images[i], new RegExp(`class="shot-img ${theme}" loading="lazy" src="/${file}" width="816" height="1766" ${alt}`));
     assert.ok(exists(`public/${file}`), file);
   });
   assert.doesNotMatch(root, /placeholder/i);
