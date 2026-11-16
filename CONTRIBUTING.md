@@ -47,6 +47,10 @@ For user-facing changes, serve `public/` locally and obtain product-owner
 visual review at mobile and desktop sizes. Record visual review separately
 from automated checks.
 
+When a file under `public/` changes, its `?v=` in `public/index.html` and
+`public/join/index.html` must become the first 8 hex characters of its new
+SHA-256; `npm test` names the expected value when it does not match.
+
 Before requesting a PR, run from the task worktree:
 
 ```bash
