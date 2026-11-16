@@ -3,18 +3,20 @@
 ## Public boundary
 
 The product name is **Eye O Ewe**. The homepage is short, one or two phone
-screens, in this order:
+screens, centred, in this order:
 
 - `Split bills with friends, privately.`
 - `Your expenses are encrypted, so only your group can see them. Most apps can
   see everything you add.`
+- `Free and ad-free`, with `There’s no limit on how many expenses you can add.`
 - Google's official `Get it on Google Play` badge, used as Google's badge
   guidelines require, linking to the Google Play internal testing opt-in so
   invited testers can install the app.
 - Two screens of the real app side by side, with no
   captions and made-up names and amounts: a group with its balances, and adding
-  an expense. The same light screens show in both themes.
-- `Free and ad-free`, with `There’s no limit on how many expenses you can add.`
+  an expense. The page shows the light or the dark screens for the theme in
+  force.
+- `Get in touch`, with `Questions or ideas? Email hello@eyeoewe.app`.
 - A footer with the support email.
 
 The whole site, the invitation page too, follows the phone's light or dark

@@ -1,8 +1,18 @@
-/* The homepage only: its layout and its screenshots. */
+/* The homepage only: a centred column, then the screenshots. */
+
+.home-hero,
+.free,
+.touch,
+.screens {
+  width: 100%;
+  max-width: 1120px;
+  margin-right: auto;
+  margin-left: auto;
+  text-align: center;
+}
 
 .home-hero {
-  flex: none;
-  padding-bottom: 0;
+  padding-top: clamp(2.5rem, 6vh, 5rem);
 }
 
 .home-title {
@@ -11,12 +21,47 @@
   line-height: 1.02;
 }
 
-.home-hero .tagline {
+.home-hero .tagline,
+.free p,
+.touch p {
   max-width: 34rem;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.free {
+  margin-top: clamp(2rem, 5vw, 3rem);
+}
+
+.free h2,
+.touch h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(1.5rem, 2.6vw, 1.9rem);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+}
+
+.free p,
+.touch p {
+  margin-top: 0.75rem;
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: clamp(1.08rem, 1.7vw, 1.3rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+}
+
+.touch a {
+  color: var(--ink);
+  text-underline-offset: 0.2em;
 }
 
 .store-badge {
-  margin: 1rem 0 0 -0.55rem;
+  margin: 1.5rem 0 0;
+  text-align: center;
 }
 
 .store-badge a {
@@ -37,15 +82,12 @@
 
 .screens {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 18rem));
-  gap: clamp(1.25rem, 3vw, 2.5rem);
-  width: 100%;
-  max-width: 1120px;
-  margin: clamp(2.5rem, 6vw, 4.5rem) auto 0;
+  grid-template-columns: repeat(2, minmax(0, 17rem));
+  gap: clamp(1rem, 3vw, 2.5rem);
+  justify-content: center;
+  margin-top: clamp(2.5rem, 6vw, 4.5rem);
 }
 
-/* The same light screens show in both themes. Dark screens, when there are some, are added as
-   images with a class (say shot-dark) hidden in light and shown in dark, with the light ones hidden. */
 .shot-img {
   display: block;
   width: 100%;
@@ -55,29 +97,31 @@
   box-shadow: 0 6px 24px rgb(7 34 64 / 10%);
 }
 
-.free {
-  width: 100%;
-  max-width: 1120px;
-  margin: clamp(3.5rem, 9vw, 6.5rem) auto 0;
+/* One image of each pair shows, for the theme in force; a hidden image is not read aloud. */
+.shot-dark {
+  display: none;
 }
 
-.free h2 {
-  margin: 0;
-  font-family: var(--display);
-  font-size: clamp(1.9rem, 3.4vw, 2.6rem);
-  font-weight: 400;
-  letter-spacing: -0.04em;
-  line-height: 1.1;
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .shot-light {
+    display: none;
+  }
+
+  :root:not([data-theme="light"]) .shot-dark {
+    display: block;
+  }
 }
 
-.free p {
-  max-width: 34rem;
-  margin: 0.75rem 0 0;
-  color: var(--muted);
-  font-size: clamp(1.08rem, 1.7vw, 1.3rem);
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  line-height: 1.4;
+:root[data-theme="dark"] .shot-light {
+  display: none;
+}
+
+:root[data-theme="dark"] .shot-dark {
+  display: block;
+}
+
+.touch {
+  margin-top: clamp(3.5rem, 9vw, 6.5rem);
 }
 
 .site-footer {

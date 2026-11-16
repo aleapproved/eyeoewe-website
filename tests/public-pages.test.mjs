@@ -78,7 +78,7 @@ test('links the Google Play badge to the install link, with the footer links aft
     createHash('sha256').update(readFileSync(resolve(process.cwd(), 'public/google-play-badge.png'))).digest('hex'),
     'f72611e2df8e88204009fd896d05d5e8e83c77009c63943bbffa169559934849',
   );
-  const order = ['hero-title', 'google-play-badge.png', 'class="screens"', 'free-title', '<footer'].map((marker) => root.indexOf(marker));
+  const order = ['hero-title', 'free-title', 'google-play-badge.png', 'class="screens"', 'touch-title', '<footer'].map((marker) => root.indexOf(marker));
   assert.deepEqual(order, [...order].sort((a, b) => a - b));
   assert.ok(!order.includes(-1));
   const footer = root.slice(root.indexOf('<footer'), root.indexOf('</footer>'));
@@ -87,21 +87,34 @@ test('links the Google Play badge to the install link, with the footer links aft
 });
 
 test('keeps the two screenshots side by side at every width', () => {
-  assert.match(home, /\.screens \{\n  display: grid;\n  grid-template-columns: repeat\(2, minmax\(0, 18rem\)\);/);
+  assert.match(home, /\.screens \{\n  display: grid;\n  grid-template-columns: repeat\(2, minmax\(0, 17rem\)\);/);
   assert.doesNotMatch(home, /max-width: 600px/);
   assert.doesNotMatch(product, /stacked/);
 });
 
-test('shows the two real app screens, with real alt text and sizes', () => {
-  const images = root.match(/<img class="shot-img"[^>]*>/g) ?? [];
-  assert.equal(images.length, 2);
-  assert.match(images[0], /src="\/app-group-light\.webp" width="576" height="1280" alt="Eye O Ewe showing a trip’s balances: who owes whom"/);
-  assert.match(images[1], /src="\/app-expense-light\.webp" width="576" height="1280" alt="Eye O Ewe adding an expense, split equally between four people"/);
+test('shows the real app screens for the theme in force, with one alt text at a time', () => {
+  const images = root.match(/<img class="shot-img[^>]*>/g) ?? [];
+  assert.equal(images.length, 4);
+  const group = 'alt="A group’s balances in Eye O Ewe"';
+  const expense = 'alt="Adding an expense in Eye O Ewe"';
+  const expected = [
+    ['shot-light', 'group-light.png', group],
+    ['shot-dark', 'group-dark.png', group],
+    ['shot-light', 'expense-light.png', expense],
+    ['shot-dark', 'expense-dark.png', expense],
+  ];
+  expected.forEach(([theme, file, alt], i) => {
+    assert.match(images[i], new RegExp(`class="shot-img ${theme}" src="/${file}" width="1080" height="2400" ${alt}`));
+    assert.ok(exists(`public/${file}`), file);
+  });
   assert.doesNotMatch(root, /placeholder/i);
-  assert.ok(exists('public/app-group-light.webp'));
-  assert.ok(exists('public/app-expense-light.webp'));
   assert.match(home, /\.shot-img \{[^}]*border-radius: 1rem;[^}]*box-shadow:/);
-  assert.doesNotMatch(home, /\.shot \{|shot-border/);
+  // The image not in force is display: none, so a screen reader meets one alt text per pair.
+  assert.match(home, /\.shot-dark \{\n  display: none;/);
+  assert.match(home, /:root:not\(\[data-theme="light"\]\) \.shot-light \{\n    display: none;/);
+  assert.match(home, /:root\[data-theme="dark"\] \.shot-light \{\n  display: none;/);
+  assert.match(root, /<h2 id="touch-title">Get in touch<\/h2>/);
+  assert.match(root, /Questions or ideas\? Email <a href="mailto:hello@eyeoewe\.app">/);
 });
 
 test('follows the phone theme with a toggle that remembers the choice, from a same-origin script', () => {
