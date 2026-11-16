@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { resolve } from 'node:path';
+import { brotliDecompressSync } from 'node:zlib';
 
 const read = (relativePath) => readFileSync(resolve(process.cwd(), relativePath), 'utf8');
 const exists = (relativePath) => existsSync(resolve(process.cwd(), relativePath));
@@ -260,6 +261,113 @@ test('uses the mobile app visual language with responsive, accessible styling', 
   assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/);
   assert.doesNotMatch(styles, /\.hero-visual/);
   assert.doesNotMatch(styles, /\.status-dot/);
+});
+
+// The characters a woff2 font can draw: its cmap table (never transformed in woff2).
+function woff2Characters(file) {
+  const buf = readFileSync(resolve(process.cwd(), file));
+  assert.equal(buf.toString('latin1', 0, 4), 'wOF2');
+  const numTables = buf.readUInt16BE(12);
+  const compressedSize = buf.readUInt32BE(20);
+  let pos = 48;
+  const readBase128 = () => {
+    let value = 0;
+    for (let i = 0; i < 5; i++) {
+      const byte = buf[pos++];
+      value = value * 128 + (byte & 0x7f);
+      if (!(byte & 0x80)) return value;
+    }
+    throw new Error('bad UIntBase128');
+  };
+  const tables = [];
+  for (let i = 0; i < numTables; i++) {
+    const flags = buf[pos++];
+    const index = flags & 0x3f;
+    const version = flags >> 6;
+    let tag;
+    if (index === 63) {
+      tag = buf.toString('latin1', pos, pos + 4);
+      pos += 4;
+    } else {
+      tag = WOFF2_TAGS[index];
+    }
+    const length = readBase128();
+    const transformed = tag === 'glyf' || tag === 'loca' ? version === 0 : version !== 0;
+    tables.push({ tag, size: transformed ? readBase128() : length });
+  }
+  const data = brotliDecompressSync(buf.subarray(pos, pos + compressedSize));
+  let offset = 0;
+  let cmap;
+  for (const table of tables) {
+    if (table.tag === 'cmap') cmap = data.subarray(offset, offset + table.size);
+    offset += table.size;
+  }
+  assert.ok(cmap, 'no cmap table in ' + file);
+  const characters = new Set();
+  const subtables = cmap.readUInt16BE(2);
+  for (let i = 0; i < subtables; i++) {
+    const sub = cmap.readUInt32BE(4 + i * 8 + 4);
+    const format = cmap.readUInt16BE(sub);
+    if (format === 4) {
+      const segments = cmap.readUInt16BE(sub + 6) / 2;
+      const ends = sub + 14;
+      const starts = ends + segments * 2 + 2;
+      const deltas = starts + segments * 2;
+      const rangeOffsets = deltas + segments * 2;
+      for (let seg = 0; seg < segments; seg++) {
+        const start = cmap.readUInt16BE(starts + seg * 2);
+        const end = cmap.readUInt16BE(ends + seg * 2);
+        const delta = cmap.readUInt16BE(deltas + seg * 2);
+        const rangeOffset = cmap.readUInt16BE(rangeOffsets + seg * 2);
+        for (let code = start; code <= end && code < 0xffff; code++) {
+          const glyph = rangeOffset
+            ? cmap.readUInt16BE(rangeOffsets + seg * 2 + rangeOffset + (code - start) * 2)
+            : code + delta;
+          if (rangeOffset ? glyph !== 0 : (glyph & 0xffff) !== 0) characters.add(String.fromCodePoint(code));
+        }
+      }
+    } else if (format === 12) {
+      const groups = cmap.readUInt32BE(sub + 12);
+      for (let g = 0; g < groups; g++) {
+        const start = cmap.readUInt32BE(sub + 16 + g * 12);
+        const end = cmap.readUInt32BE(sub + 20 + g * 12);
+        for (let code = start; code <= end; code++) characters.add(String.fromCodePoint(code));
+      }
+    }
+  }
+  return characters;
+}
+const WOFF2_TAGS = ['cmap', 'head', 'hhea', 'hmtx', 'maxp', 'name', 'OS/2', 'post', 'cvt ', 'fpgm', 'glyf', 'loca', 'prep', 'CFF ', 'VORG', 'EBDT', 'EBLC', 'gasp', 'hdmx', 'kern', 'LTSH', 'PCLT', 'VDMX', 'vhea', 'vmtx', 'BASE', 'GDEF', 'GPOS', 'GSUB', 'EBSC', 'JSTF', 'MATH', 'CBDT', 'CBLC', 'COLR', 'CPAL', 'SVG ', 'sbix', 'acnt', 'avar', 'bdat', 'bloc', 'bsln', 'cvar', 'fdsc', 'feat', 'fmtx', 'fvar', 'gvar', 'hsty', 'just', 'lcar', 'mort', 'morx', 'opbd', 'prop', 'trak', 'Zapf', 'Silf', 'Glat', 'Gloc', 'Feat', 'Sill'];
+
+const decodeEntities = (text) =>
+  text
+    .replace(/&nbsp;/g, '\u00a0')
+    .replace(/&amp;/g, '&')
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)));
+const visibleText = (html) =>
+  decodeEntities(
+    html
+      .slice(html.indexOf('<body>'), html.indexOf('</body>'))
+      .replace(/<(script|style)\b[\s\S]*?<\/\1>/g, '')
+      .replace(/<[^>]*>/g, ' '),
+  );
+const missingFrom = (characters, text) => [...new Set(text)].filter((c) => !/[\n\r\t]/.test(c) && !characters.has(c));
+
+test('the Roboto and Noto Serif subsets cover every character the pages and scripts show', () => {
+  const roboto = woff2Characters('public/fonts/Roboto-400Regular.woff2');
+  const pages = [root, read('public/join/index.html')];
+  let text = pages.map(visibleText).join('');
+  for (const script of ['public/theme.js', 'public/open-invitation.js']) {
+    for (const literal of read(script).matchAll(/'((?:[^'\\\n]|\\.)*)'|"((?:[^"\\\n]|\\.)*)"|`((?:[^`\\]|\\.)*)`/g)) {
+      text += literal[1] ?? literal[2] ?? literal[3];
+    }
+  }
+  assert.ok(text.includes('’') && text.includes('\u00a0'));
+  assert.deepEqual(missingFrom(roboto, text), []);
+  const serif = woff2Characters('public/fonts/NotoSerif-400Regular.woff2');
+  const wordmark = pages.map((html) => decodeEntities(html.match(/<span>(Eye&nbsp;O&nbsp;Ewe)<\/span>/)[1])).join('');
+  assert.deepEqual(missingFrom(serif, wordmark), []);
 });
 
 test('self-hosts small Roboto and Noto Serif fonts with their licences', () => {

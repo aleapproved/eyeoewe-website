@@ -12,10 +12,10 @@ screens, centred, in this order:
 - Google's official `Get it on Google Play` badge, used as Google's badge
   guidelines require, linking to the Google Play internal testing opt-in so
   invited testers can install the app.
-- Two screens of the real app side by side, with no
-  captions and made-up names and amounts: a group with its balances, and adding
-  an expense. The page shows the light or the dark screens for the theme in
-  force.
+- Two screens of the real app side by side, with no captions and made-up
+  names and amounts: a group's main page, with its balance and recent expenses,
+  and adding an expense. The page shows the light or the dark screens for the
+  theme in force.
 - `Get in touch`, with `Questions or ideas? Email hello@eyeoewe.app`.
 
 The whole site, the invitation page too, follows the phone's light or dark

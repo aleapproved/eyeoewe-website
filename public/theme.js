@@ -25,6 +25,9 @@
   };
   syncThemeColor();
 
+  // iOS Safari applies :active on tap only when the page has a touch listener.
+  document.addEventListener('touchstart', () => {}, { passive: true });
+
   document.addEventListener('DOMContentLoaded', () => {
     const toggle = document.getElementById('theme-toggle');
     if (!toggle) return;
