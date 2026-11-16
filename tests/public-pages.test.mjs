@@ -297,6 +297,12 @@ test('the visible name Eye O Ewe never breaks across lines', () => {
   }
 });
 
+test('turns off the browser tap highlight and gives pressed states of its own', () => {
+  assert.match(styles, /\* \{[^}]*-webkit-tap-highlight-color: transparent;/);
+  assert.match(styles, /\.theme-toggle:active \{[^}]*background: var\(--line\)/);
+  assert.match(styles, /a:active \{[^}]*opacity/);
+});
+
 test('headings wrap into even lines', () => {
   assert.match(styles, /h1,\s*h2 \{[^}]*text-wrap: balance/);
 });

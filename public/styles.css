@@ -52,6 +52,7 @@
 
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html {
@@ -70,6 +71,11 @@ body {
 
 a {
   color: inherit;
+}
+
+/* A quiet pressed state, since the browser's tap highlight is off. */
+a:active {
+  opacity: 0.7;
 }
 
 img {
@@ -136,6 +142,10 @@ img {
   background: transparent;
   color: var(--ink);
   cursor: pointer;
+}
+
+.theme-toggle:active {
+  background: var(--line);
 }
 
 .theme-toggle:focus-visible {
