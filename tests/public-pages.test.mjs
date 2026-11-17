@@ -588,9 +588,11 @@ test('publishes the privacy policy and the delete-account page as real pages, ot
     const path = `/eyeoewe/v1/${page}/`;
     // A rule that serves the path itself, before the catch-all redirect.
     assert.ok(lines.includes(`${path} ${path} 200`), path);
+    assert.ok(lines.includes(`${path.slice(0, -1)} ${path} 200`), path.slice(0, -1));
+    assert.ok(lines.indexOf(`${path.slice(0, -1)} ${path} 200`) < lines.indexOf('/eyeoewe/v1/* / 302'));
     assert.ok(lines.indexOf(`${path} ${path} 200`) < lines.indexOf('/eyeoewe/v1/* / 302'));
   }
-  assert.equal(lines.filter((line) => line.startsWith('/eyeoewe/v1/')).length, 3);
+  assert.equal(lines.filter((line) => line.startsWith('/eyeoewe/v1/')).length, 5);
   assert.ok(redirectSourceMatches('/eyeoewe/v1/*', '/eyeoewe/v1/x'));
   assert.ok(redirectSourceMatches('/eyeoewe/v1/*', '/eyeoewe/v1/privacy/x'));
 });
@@ -598,7 +600,7 @@ test('publishes the privacy policy and the delete-account page as real pages, ot
 test('the legal pages render their headings, with the policy placeholders left visible', () => {
   const policy = textOf(legalPages.privacy);
   assert.match(legalPages.privacy, /<h1 id="page-title">Privacy policy<\/h1>/);
-  for (const heading of ['What we can\'t see', 'What we handle, and why', 'Our legal reasons', 'Who else is involved', 'How long we keep it', 'Your rights', 'Children', 'Changes']) {
+  for (const heading of ['What we can’t see', 'What we handle, and why', 'Our legal reasons', 'Who else is involved', 'How long we keep it', 'Your rights', 'Children', 'Changes']) {
     assert.ok(legalPages.privacy.includes(`<h2>${heading}</h2>`), heading);
   }
   for (const placeholder of ['[CONTROLLER NAME]', '[REGION]', '[MAIL PROVIDER]', '[TRANSFERS:', '[PERIOD]', '[AGE]', '[DATE]']) {
@@ -609,13 +611,13 @@ test('the legal pages render their headings, with the policy placeholders left v
 
   const del = textOf(legalPages['delete-account']);
   assert.match(legalPages['delete-account'], /<h1 id="page-title">Delete your Eye&nbsp;O&nbsp;Ewe account<\/h1>/);
-  for (const heading of ['In the app', 'Without the app', 'What\'s deleted and what\'s kept', 'Subscriptions']) {
+  for (const heading of ['In the app', 'Without the app', 'What’s deleted and what’s kept', 'Subscriptions']) {
     assert.ok(legalPages['delete-account'].includes(`<h2>${heading}</h2>`), heading);
   }
   assert.ok(del.includes('Account menu › Delete account. First leave or delete each of your groups.'));
   assert.ok(del.includes('Email privacy@eyeoewe.app from the address you signed up with'));
   assert.ok(del.includes('within one month'));
-  assert.ok(del.includes("Deleting your account doesn't cancel a Google Play subscription: cancel it in Google Play."));
+  assert.ok(del.includes("Deleting your account doesn’t cancel a Google Play subscription: cancel it in Google Play."));
   assert.doesNotMatch(del, /\[[A-Z-]+[^\]]*\]/);
 });
 
@@ -628,9 +630,9 @@ test('the legal pages share the site look and load nothing from elsewhere', () =
     assert.match(html, /<meta name="color-scheme" content="light dark" \/>/);
     assert.doesNotMatch(html, /<(?:img|link|script|iframe|form|source|video|audio)\b[^>]*(?:src|href|action)="(?:https?:)?\/\/(?!eyeoewe\.app\/)/i);
     assert.doesNotMatch(html, /<style\b|style="|\son[a-z]+=/i);
-    // The only external links are the mailto and the site's own pages.
+    // The only external links are the mailto, the site's own pages and the ICO complaints page.
     for (const [, href] of html.matchAll(/href="([^"]*)"/g)) {
-      assert.ok(/^(?:\/|mailto:|https:\/\/eyeoewe\.app\/)/.test(href), href);
+      assert.ok(/^(?:\/|mailto:|https:\/\/eyeoewe\.app\/|https:\/\/ico\.org\.uk\/make-a-complaint\/$)/.test(href), href);
     }
     assert.ok(visibleText(html).includes('Eye\u00a0O\u00a0Ewe'));
     assert.doesNotMatch(visibleText(html), /Eye[ \t\r\n]+O[ \t\r\n]+Ewe/);

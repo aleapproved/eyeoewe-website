@@ -1,6 +1,8 @@
 # The reserved legacy route returns to the homepage, except the pages below, which are real.
 /eyeoewe/v1/privacy/ /eyeoewe/v1/privacy/ 200
+/eyeoewe/v1/privacy /eyeoewe/v1/privacy/ 200
 /eyeoewe/v1/delete-account/ /eyeoewe/v1/delete-account/ 200
+/eyeoewe/v1/delete-account /eyeoewe/v1/delete-account/ 200
 /eyeoewe/v1/* / 302
 # Every invitation link shows the same install page; the secret stays in the browser address only.
 /join/* /join/ 200
