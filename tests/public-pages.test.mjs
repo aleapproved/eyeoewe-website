@@ -603,9 +603,11 @@ test('the legal pages render their headings, with the policy placeholders left v
   for (const heading of ['What we can’t see', 'What we handle, and why', 'Our legal reasons', 'Who else is involved', 'How long we keep it', 'Your rights', 'Children', 'Changes']) {
     assert.ok(legalPages.privacy.includes(`<h2>${heading}</h2>`), heading);
   }
-  for (const placeholder of ['[CONTROLLER NAME]', '[REGION]', '[MAIL PROVIDER]', '[TRANSFERS:', '[PERIOD]', '[AGE]', '[DATE]']) {
+  for (const placeholder of ['[CONTROLLER NAME]', '[REGION]', '[MAIL PROVIDER]', '[PERIOD]', '[AGE]', '[DATE]']) {
     assert.ok(policy.includes(placeholder), placeholder);
   }
+  assert.ok(policy.includes('Some of this information is handled outside the UK: Supabase handles some account, support and log information in Singapore and the United States'));
+  assert.ok(!policy.includes('[TRANSFERS'));
   assert.ok(legalPages.privacy.includes('<a href="https://eyeoewe.app/eyeoewe/v1/delete-account/">'));
   assert.ok(policy.includes('account menu › Delete account'));
 
