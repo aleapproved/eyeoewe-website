@@ -15,7 +15,7 @@ screens, centred, in this order:
   names and amounts: a group's main page, with its balance and recent expenses,
   and adding an expense. The page shows the light or the dark screens for the
   theme in force.
-- `Get in touch`, with `Questions or ideas? Email hello@eyeoewe.app`.
+- `Get in touch at hello@eyeoewe.app`.
 
 The whole site, the invitation page too, follows the phone's light or dark
 setting. A small toggle in the header overrides it and remembers the choice on
