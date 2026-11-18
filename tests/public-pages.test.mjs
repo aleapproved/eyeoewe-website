@@ -82,7 +82,7 @@ test('links the Google Play badge to the install link, with the content in order
     createHash('sha256').update(readFileSync(resolve(process.cwd(), 'public/google-play-badge.png'))).digest('hex'),
     'f72611e2df8e88204009fd896d05d5e8e83c77009c63943bbffa169559934849',
   );
-  const order = ['hero-title', 'free-title', 'google-play-badge.png', 'class="screens"', 'touch-title'].map((marker) => root.indexOf(marker));
+  const order = ['hero-title', 'free-title', 'google-play-badge.png', 'class="screens"', 'class="touch"'].map((marker) => root.indexOf(marker));
   assert.deepEqual(order, [...order].sort((a, b) => a - b));
   assert.ok(!order.includes(-1));
 });
@@ -114,8 +114,8 @@ test('shows the real app screens for the theme in force, with one alt text at a 
   assert.match(home, /\.shot-dark \{\n  display: none;/);
   assert.match(home, /:root:not\(\[data-theme="light"\]\) \.shot-light \{\n    display: none;/);
   assert.match(home, /:root\[data-theme="dark"\] \.shot-light \{\n  display: none;/);
-  assert.match(root, /<h2 id="touch-title">Get in touch<\/h2>/);
-  assert.match(root, /Questions or ideas\? Email <a href="mailto:hello@eyeoewe\.app">/);
+  assert.match(root, /<p class="touch">Get in touch at <a href="mailto:hello@eyeoewe\.app">hello@eyeoewe\.app<\/a><\/p>/);
+  assert.doesNotMatch(root, /touch-title/);
 });
 
 test('keeps the dark palette identical in both blocks, the browser-bar colours and the early theme script', () => {

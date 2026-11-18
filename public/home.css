@@ -20,7 +20,7 @@
 }
 
 .point p,
-.touch p {
+.touch {
   max-width: 34rem;
   margin-right: auto;
   margin-left: auto;
@@ -30,8 +30,7 @@
   margin-top: clamp(2rem, 5vw, 3rem);
 }
 
-.point h2,
-.touch h2 {
+.point h2 {
   margin: 0;
   font-size: clamp(1.5rem, 2.6vw, 1.9rem);
   font-weight: 600;
@@ -40,7 +39,7 @@
 }
 
 .point p,
-.touch p {
+.touch {
   margin-top: 0.75rem;
   margin-bottom: 0;
   color: var(--muted);
