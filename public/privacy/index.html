@@ -15,7 +15,7 @@
     <script src="/theme.js?v=c6158052"></script>
   </head>
   <body>
-    <main class="site-shell">
+    <div class="site-shell">
       <header class="site-header">
         <a class="brand" href="/" aria-label="Eye O Ewe home">
           <img class="brand-mark" src="/app-icon.webp?v=9511f09d" alt="" width="44" height="44" />
@@ -27,7 +27,7 @@
         </button>
       </header>
 
-      <article class="legal" aria-labelledby="page-title">
+      <main class="legal" aria-labelledby="page-title">
         <h1 id="page-title">Privacy Policy</h1>
         <p class="updated">Last updated: 26 November 2026</p>
         <p>Eye&nbsp;O&nbsp;Ewe is an app for keeping track of shared expenses and payments in a group. This policy explains what information the app and its service handle, why, who else is involved, how long it’s kept and what your rights are.</p>
@@ -40,7 +40,7 @@
         </ul>
         <h2>What we can’t see</h2>
         <p>Group names and icons, the names and icon styles of the people in them, and every expense and payment (amounts, descriptions, categories and how they’re split), along with summaries of imported history, are encrypted on your phone before they reach our servers, and only the people in the group can read them. We can’t read them, and neither can anyone we work with. We never receive your password or recovery words.</p>
-        <p>What encryption doesn’t hide: which account is in which group and its role there, when things were added or changed, and how big they are. Encryption protects your groups from us, not from the people in them: everyone in a group can see its whole history, including what was added before they joined, and anyone who leaves keeps what they could already see.</p>
+        <p>What encryption doesn’t hide: which account is in which group and its role there, who added or changed each thing and when, roughly what kind of change it was, and how big it is. Encryption protects your groups from us, not from the people in them: everyone in a group can see its whole history, including what was added before they joined, and anyone who leaves keeps what they could already see.</p>
         <p>Other members may add your name, and expenses and payments that involve you, to a group. These are encrypted in the same way.</p>
         <h2>What we handle, and why</h2>
         <ul>
@@ -49,7 +49,7 @@
         <li><strong>Account and group records.</strong> Random IDs for your account, your groups, their entries and invitations; which groups you’re in and your role; and when each change was made. We need these to run the service. The secret part of an invitation link never reaches our website or servers.</li>
         <li><strong>Your internet (IP) address.</strong> Our servers, and our website’s host, see it when your phone or browser connects. Our sign-in service also records it, with your phone’s app details, for each signed-in session, until you sign out or delete your account.</li>
         <li><strong>Your phone’s notification token, if you turn notifications on.</strong> To send you notifications about your groups. On Android, when someone adds an expense or payment in a group, the notification carries that entry still encrypted, so your phone can open it and show who added what; our servers and the notification services can’t read it. If your phone can’t open it, it shows a general message instead. Once your phone shows the details, apps you have allowed to read your notifications can read them, as with any notification, and they can appear in Android’s notification history. A group’s key doesn’t change when someone leaves, so a former member who somehow obtained such a notification could read that entry.</li>
-        <li><strong>Security and usage limits.</strong> Short-lived counts of how often an account adds things and of wrong password attempts, to stop abuse.</li>
+        <li><strong>Security and usage limits.</strong> Counts of how often an account adds things, and records of wrong password attempts, to stop abuse.</li>
         <li><strong>Support emails.</strong> If you email us, we get your email address and whatever you write. If you choose to attach the app’s diagnostic report, it holds your app version, phone make and model, Android version, text size and time zone, and a list of the app’s recent technical events and error codes with their times. It never holds your groups, names, amounts, recovery words or any of your encrypted information. Your phone keeps this list for up to 7 days, and it’s only sent if you attach it.</li>
         </ul>
         <p>You need an email address and a password to use Eye&nbsp;O&nbsp;Ewe; without them we can’t create your account. Everything else is optional. We don’t make decisions about you by automated means.</p>
@@ -76,10 +76,10 @@
         <h2>How long we keep it</h2>
         <p>Your account information is kept until you delete your account.</p>
         <p>To delete your account, first leave or delete each of your groups. We then delete your email address, password record, profile, encryption keys, pending invitations, notification tokens and recovery information straight away. We keep only your random account ID, as a record that it existed and of which groups it was in and what it added. Expenses, payments and your name as written in groups you were in stay, encrypted, in those groups’ history and on members’ phones.</p>
-        <p>Your groups, including removed expenses and payments, are kept until an admin deletes the group, which deletes it from our servers straight away. A record of each notification we send you (which group it was about, and when) is kept until you delete your account.</p>
-        <p>Notification tokens are deleted when you turn notifications off, sign out or delete your account, and stop being used once a phone no longer has the app. Usage counts and records of wrong password attempts are short-lived: they’re cleared as newer ones are recorded, normally within a day. Records of password-change emails are cleared after 30 days as newer ones are recorded, and when you delete your account. Personal invitations stop working after 7 days; group invitation links work until an admin resets them. Imported history that an admin undoes is deleted after 30 days. We keep support emails for 2 years after the conversation ends.</p>
+        <p>Your groups, including removed expenses and payments, are kept until an admin deletes the group, or permanently deletes those expenses and payments, which deletes them from our servers straight away. A record of each notification we send you (which group it was about, and when) is kept until you delete your account.</p>
+        <p>Notification tokens are deleted when you turn notifications off, sign out or delete your account, and stop being used once a phone no longer has the app. Usage counts are short-lived: they’re cleared as newer ones are recorded, normally within a day. If you enter a wrong current password when changing your password, a record of it is kept until you next change your password or delete your account. Records of password-change emails are cleared after 30 days as newer ones are recorded, and when you delete your account. Personal invitations stop working after 7 days; group invitation links work until an admin resets them. Imported history that an admin undoes is deleted after 30 days. We keep support emails for 2 years after the conversation ends.</p>
         <p>Our database is backed up every day, and each backup is kept for 7 days. We also keep a copy taken before each update that changes our database, until the next such update replaces it.</p>
-        <p>Supabase, which runs our sign-in, keeps a log of sign-ins and account changes, which can include your email and internet address; deleting your account doesn’t delete it. Our other providers keep their own technical logs, such as internet addresses, for the periods in their own policies.</p>
+        <p>Supabase, which runs our sign-in, keeps a log of sign-ins and account changes, which can include your email and internet address; deleting your account doesn’t delete it. Supabase and our other providers also keep their own technical logs, such as internet addresses, for the periods in their own policies.</p>
         <h2>Your rights</h2>
         <p>You can ask us for a copy of your information, to correct it, to delete it, to receive it in a form you can reuse, or to restrict how we use it. We can’t read your encrypted groups, so a copy we send includes only what we hold in readable form; your groups’ contents are in the app.</p>
         <p>You can object at any time to our use of your information for our legitimate interests.</p>
@@ -90,12 +90,12 @@
         <p>Eye&nbsp;O&nbsp;Ewe is for people aged 18 and over. If you think a child has given us information, contact us and we’ll delete it.</p>
         <h2>Changes</h2>
         <p>If we change this policy, we’ll update this page and the date at the top. Before Eye&nbsp;O&nbsp;Ewe can sell Pro, we’ll update it to cover how subscriptions work.</p>
-      </article>
+      </main>
 
       <footer class="site-footer">
         <p class="touch">Get in touch at <a href="mailto:hello@eyeoewe.app">hello@eyeoewe.app</a></p>
         <p class="footer-links"><a href="/privacy/" aria-current="page">Privacy</a> · <a href="/support/">Support</a></p>
       </footer>
-    </main>
+    </div>
   </body>
 </html>

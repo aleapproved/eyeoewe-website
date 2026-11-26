@@ -115,6 +115,7 @@ test('shows the real app screens for the theme in force, with one alt text at a 
   assert.match(home, /:root:not\(\[data-theme="light"\]\) \.shot-light \{\n    display: none;/);
   assert.match(home, /:root\[data-theme="dark"\] \.shot-light \{\n  display: none;/);
   assert.match(root, /<p class="touch">Get in touch at <a href="mailto:hello@eyeoewe\.app">hello@eyeoewe\.app<\/a><\/p>/);
+  assert.match(root, /<\/main>\s*<footer class="site-footer">[\s\S]*<\/footer>\s*<\/div>/);
   assert.match(root, /<p class="footer-links"><a href="\/privacy\/">Privacy<\/a> · <a href="\/support\/">Support<\/a><\/p>/);
   assert.doesNotMatch(root, /touch-title/);
 });
@@ -196,6 +197,8 @@ test('serves the privacy, support and delete-account pages with the site header,
     assert.match(html, /<p class="touch">Get in touch at <a href="mailto:hello@eyeoewe\.app">hello@eyeoewe\.app<\/a><\/p>/, slug);
     assert.match(html, /<p class="footer-links"><a href="\/privacy\/"[^>]*>Privacy<\/a> · <a href="\/support\/"[^>]*>Support<\/a><\/p>/, slug);
     assert.doesNotMatch(html, /<form\b|<input\b|<iframe\b/, slug);
+    // The header, main content and footer are separate landmarks.
+    assert.match(html, /<div class="site-shell">\s*<header class="site-header">[\s\S]*<\/header>\s*<main\b[\s\S]*<\/main>\s*<footer class="site-footer">[\s\S]*<\/footer>\s*<\/div>/, slug);
     // Nothing loads from another site; the only link away is the ICO's complaints page.
     assert.doesNotMatch(html.replace(/<link rel="canonical"[^>]*>/, ''), /(?:src|<link[^>]+href)="(?:https?:)?\/\//, slug);
     const outside = [...html.matchAll(/<a [^>]*href="(https?:[^"]+)"/g)].map((match) => match[1]);
