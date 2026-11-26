@@ -179,7 +179,7 @@ test('keeps the Asset Links route outside configured redirects', () => {
 });
 
 const publicPages = ['privacy', 'support', 'delete-account'].map((slug) => [slug, read(`public/${slug}/index.html`)]);
-const pageText = (html) => html.slice(html.indexOf('<body>'), html.indexOf('</body>')).replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+const pageText = (html) => html.slice(html.indexOf('<body>'), html.indexOf('</body>')).replace(/<\/?(?:strong|a)\b[^>]*>/g, '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 
 test('serves the privacy, support and delete-account pages with the site header, theme and footer only', () => {
   for (const [slug, html] of publicPages) {
@@ -218,6 +218,10 @@ test('serves the privacy, support and delete-account pages with the site header,
   assert.match(deletion, /<h1 id="page-title">Delete your Eye&nbsp;O&nbsp;Ewe account<\/h1>/);
   assert.match(pageText(deletion), /Eye O Ewe is made by aleapproved\./);
   assert.match(pageText(deletion), /Tap Permanently delete account\./);
+  // On-screen labels are bold, the same way on every page.
+  for (const label of ['Get in touch', 'Attach diagnostic report', 'Open email app', 'Forgot password?']) assert.ok(support.includes(`<strong>${label}</strong>`), label);
+  for (const label of ['Delete account', 'Permanently delete account']) assert.ok(deletion.includes(`<strong>${label}</strong>`), label);
+  assert.match(read('public/join/index.html'), /<div class="site-shell">\s*<header class="site-header">[\s\S]*<\/header>\s*<main>[\s\S]*<\/main>\s*<\/div>/);
   assert.match(deletion, /href="mailto:privacy@eyeoewe\.app"/);
   assert.match(pageText(deletion), /What’s deleted.*What’s kept/);
   assert.match(deletion, /href="\/privacy\/"/);
