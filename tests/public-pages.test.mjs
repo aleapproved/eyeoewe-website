@@ -50,12 +50,12 @@ test('publishes the short branded homepage with the approved copy only', () => {
   assert.match(bodyText, /Split bills with friends, privately\./);
   assert.match(
     bodyText,
-    /End-to-end encrypted\. Only your group can see your expenses\. Free\. And ad-free\. Unlimited expenses\. No distractions\./,
+    /End-to-end encrypted\. Only your group can see your expenses\. Free to start\. Ad-free forever\. Unlimited expenses in one group\. Go Pro for more\./,
   );
   assert.doesNotMatch(bodyText, /Your expenses are encrypted, so only/);
   assert.match(root, /<h1\b[^>]*>Split bills with friends, privately\.<\/h1>\s*<\/section>\s*<section class="point"[^>]*>\s*<h2[^>]*>End-to-end encrypted\.<\/h2>/);
   assert.match(root, /content="Split bills with friends, privately\. Only your group can see your expenses\."/);
-  assert.ok(root.indexOf('Free. And ad-free.') < root.indexOf('google-play-badge.png'));
+  assert.ok(root.indexOf('Free to start. Ad-free forever.') < root.indexOf('google-play-badge.png'));
   assert.doesNotMatch(bodyText, /Most apps can see|no limit on how many/);
   assert.doesNotMatch(bodyText, /Invite-only|Install from Google Play|Simple\. Free\. Encrypted\.|Shared expenses/);
   assert.match(root, /<img class="brand-mark" src="\/app-icon\.webp\?v=[0-9a-f]{8}"[^>]+width="44"[^>]+height="44"/);
@@ -63,12 +63,12 @@ test('publishes the short branded homepage with the approved copy only', () => {
   assert.match(root, /og:image.*social-preview\.jpg/);
   assert.match(root, /twitter:image.*social-preview\.jpg/);
   assert.doesNotMatch(root, /<nav\b|<form\b|<input\b|<ul\b|<ol\b/);
-  assert.doesNotMatch(root, /Free forever|feature grid|testimonial/i);
+  assert.doesNotMatch(root, /(?<!Ad-)Free forever|feature grid|testimonial/i);
   for (const file of ['app-icon.png', 'app-icon.webp', 'social-preview.jpg', 'favicon.png', 'styles.css', 'home.css', 'theme.js', 'google-play-badge.png']) {
     assert.ok(exists(`public/${file}`), `missing ${file}`);
   }
   assert.ok(!exists('public/eyeoewe-logo.png'));
-  assert.match(redirects, /^\/eyeoewe\/v1\/\* \/ 302$/m);
+  assert.doesNotMatch(redirects, /eyeoewe\/v1/);
   assert.ok(!exists('public/eyeoewe'));
 });
 
@@ -115,6 +115,7 @@ test('shows the real app screens for the theme in force, with one alt text at a 
   assert.match(home, /:root:not\(\[data-theme="light"\]\) \.shot-light \{\n    display: none;/);
   assert.match(home, /:root\[data-theme="dark"\] \.shot-light \{\n  display: none;/);
   assert.match(root, /<p class="touch">Get in touch at <a href="mailto:hello@eyeoewe\.app">hello@eyeoewe\.app<\/a><\/p>/);
+  assert.match(root, /<p class="footer-links"><a href="\/privacy\/">Privacy<\/a> · <a href="\/support\/">Support<\/a><\/p>/);
   assert.doesNotMatch(root, /touch-title/);
 });
 
@@ -169,13 +170,55 @@ test('keeps the Asset Links route outside configured redirects', () => {
     ),
     false,
   );
-  assert.equal(
-    redirectSources.some((source) => redirectSourceMatches(source, '/eyeoewe/v1/x')),
-    true,
-  );
+  // The invitation rewrite is the only rule: the public pages are served as themselves.
+  assert.deepEqual(redirectSources, ['/join/*']);
   assert.match(headers, /^\/\*$/m);
   assert.match(headers, /^\/\.well-known\/assetlinks\.json$/m);
   assert.match(headers, /Content-Type: application\/json/);
+});
+
+const publicPages = ['privacy', 'support', 'delete-account'].map((slug) => [slug, read(`public/${slug}/index.html`)]);
+const pageText = (html) => html.slice(html.indexOf('<body>'), html.indexOf('</body>')).replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+
+test('serves the privacy, support and delete-account pages with the site header, theme and footer only', () => {
+  for (const [slug, html] of publicPages) {
+    assert.match(html, /<html lang="en-GB">/, slug);
+    assert.match(html, new RegExp(`<link rel="canonical" href="https://eyeoewe\\.app/${slug}/" />`), slug);
+    assert.doesNotMatch(html, /noindex/, slug);
+    assert.match(html, /<meta name="color-scheme" content="light dark" \/>/, slug);
+    assert.deepEqual(html.match(/<script\b[^>]*>/g).map((tag) => tag.replace(/\?v=[0-9a-f]{8}/, '')), ['<script src="/theme.js">'], slug);
+    assert.deepEqual(
+      html.match(/<link rel="stylesheet"[^>]*>/g).map((tag) => tag.replace(/\?v=[0-9a-f]{8}/, '')),
+      ['<link rel="stylesheet" href="/styles.css" />', '<link rel="stylesheet" href="/legal.css" />'],
+      slug,
+    );
+    assert.match(html, /<button class="theme-toggle" id="theme-toggle" type="button"[^>]* hidden>/, slug);
+    assert.match(html, /<p class="touch">Get in touch at <a href="mailto:hello@eyeoewe\.app">hello@eyeoewe\.app<\/a><\/p>/, slug);
+    assert.match(html, /<p class="footer-links"><a href="\/privacy\/"[^>]*>Privacy<\/a> · <a href="\/support\/"[^>]*>Support<\/a><\/p>/, slug);
+    assert.doesNotMatch(html, /<form\b|<input\b|<iframe\b/, slug);
+    // Nothing loads from another site; the only link away is the ICO's complaints page.
+    assert.doesNotMatch(html.replace(/<link rel="canonical"[^>]*>/, ''), /(?:src|<link[^>]+href)="(?:https?:)?\/\//, slug);
+    const outside = [...html.matchAll(/<a [^>]*href="(https?:[^"]+)"/g)].map((match) => match[1]);
+    assert.deepEqual(outside, slug === 'privacy' ? ['https://ico.org.uk/make-a-complaint/'] : [], slug);
+  }
+  const [privacy, support, deletion] = publicPages.map(([, html]) => html);
+  assert.match(privacy, /<h1 id="page-title">Privacy Policy<\/h1>/);
+  assert.match(privacy, /Last updated: \d{1,2} [A-Z][a-z]+ \d{4}/);
+  assert.match(pageText(privacy), /run by aleapproved in the United Kingdom/);
+  assert.match(privacy, /href="mailto:privacy@eyeoewe\.app"/);
+  assert.match(pageText(privacy), /for people aged 18 and over/);
+  assert.match(privacy, /href="\/delete-account\/"/);
+  assert.match(support, /href="mailto:hello@eyeoewe\.app"/);
+  assert.match(support, /href="\/delete-account\/"/);
+  assert.match(support, /href="\/privacy\/"/);
+  // Google Play: the deletion page names the app and the developer, gives the steps, and a way without the app.
+  assert.match(deletion, /<h1 id="page-title">Delete your Eye&nbsp;O&nbsp;Ewe account<\/h1>/);
+  assert.match(pageText(deletion), /Eye O Ewe is made by aleapproved\./);
+  assert.match(pageText(deletion), /Tap Permanently delete account\./);
+  assert.match(deletion, /href="mailto:privacy@eyeoewe\.app"/);
+  assert.match(pageText(deletion), /What’s deleted.*What’s kept/);
+  assert.match(deletion, /href="\/privacy\/"/);
+  assert.match(read('public/legal.css'), /\.legal \{/);
 });
 
 const join = read('public/join/index.html');
@@ -355,7 +398,7 @@ const missingFrom = (characters, text) => [...new Set(text)].filter((c) => !/[\n
 
 test('the Roboto and Noto Serif subsets cover every character the pages and scripts show', () => {
   const roboto = woff2Characters('public/fonts/Roboto-400Regular.woff2');
-  const pages = [root, read('public/join/index.html')];
+  const pages = [root, read('public/join/index.html'), ...publicPages.map(([, html]) => html)];
   let text = pages.map(visibleText).join('');
   for (const script of ['public/theme.js', 'public/open-invitation.js']) {
     for (const literal of read(script).matchAll(/'((?:[^'\\\n]|\\.)*)'|"((?:[^"\\\n]|\\.)*)"|`((?:[^`\\]|\\.)*)`/g)) {
@@ -397,7 +440,7 @@ test('self-hosts small Roboto and Noto Serif fonts with their licences', () => {
 });
 
 test('the visible name Eye O Ewe never breaks across lines', () => {
-  for (const html of [root, read('public/join/index.html')]) {
+  for (const html of [root, read('public/join/index.html'), ...publicPages.map(([, html]) => html)]) {
     const visible = html
       .slice(html.indexOf('<body>'), html.indexOf('</body>'))
       .replace(/<(script|style)\b[\s\S]*?<\/\1>/g, '')
@@ -485,7 +528,7 @@ test('defines the durable website documentation model and product boundary', () 
   for (const copy of [
     'Eye O Ewe',
     'Split bills with friends, privately\\.',
-    'Free\\. And ad-free\\.',
+    'Free to start\\. Ad-free forever\\.',
   ]) {
     assert.match(product, new RegExp(copy));
   }
@@ -522,7 +565,8 @@ test('documents automatic Pages publication, guarded manual recovery, and eviden
   assert.match(release, /dedicated clean release\s+checkout/);
   assert.match(release, /https:\/\/eyeoewe\.app\//);
   assert.match(release, /security headers defined in `public\/_headers`/);
-  assert.match(release, /reserved `\/eyeoewe\/v1\/\.\.\.` route/);
+  assert.match(release, /`\/privacy\/`, `\/support\/` and `\/delete-account\/` each return their page/);
+  assert.doesNotMatch(release + architecture, /eyeoewe\/v1|legacy/);
   assert.match(architecture, /manual Wrangler helper is retained for recovery/);
   assert.match(architecture, /not an equivalent normal release\s+path/);
   assert.doesNotMatch(readme, /following actions require separate, explicit owner approval/);

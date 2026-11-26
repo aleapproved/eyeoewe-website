@@ -38,7 +38,7 @@ the following from read-only evidence:
 - the response includes the security headers defined in `public/_headers`,
   including the CSP, `Permissions-Policy`, `Referrer-Policy`,
   `X-Content-Type-Options`, and `X-Frame-Options`;
-- a reserved `/eyeoewe/v1/...` route returns the configured redirect to `/`;
+- `/privacy/`, `/support/` and `/delete-account/` each return their page (200);
   and
 - an invitation route such as `/join/example` returns the invitation page
   (200, no redirect) with a single `Content-Security-Policy` whose
@@ -50,7 +50,9 @@ For example, inspect headers without following the redirect:
 curl -fsSI https://eyeoewe.app/
 curl -fsSI https://eyeoewe.app/styles.css
 curl -fsSI https://eyeoewe.app/app-icon.webp
-curl -sS -D - -o /dev/null https://eyeoewe.app/eyeoewe/v1/example
+curl -fsSI https://eyeoewe.app/privacy/
+curl -fsSI https://eyeoewe.app/support/
+curl -fsSI https://eyeoewe.app/delete-account/
 curl -sS -D - -o /dev/null https://eyeoewe.app/join/example
 ```
 

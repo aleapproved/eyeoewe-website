@@ -7,7 +7,8 @@ screens, centred, in this order:
 
 - `Split bills with friends, privately.`
 - `End-to-end encrypted.`, with `Only your group can see your expenses.`
-- `Free. And ad-free.`, with `Unlimited expenses. No distractions.`
+- `Free to start. Ad-free forever.`, with
+  `Unlimited expenses in one group. Go Pro for more.`
 - Google's official `Get it on Google Play` badge, used as Google's badge
   guidelines require, linking to the Google Play internal testing opt-in so
   invited testers can install the app.
@@ -15,19 +16,34 @@ screens, centred, in this order:
   names and amounts: a group's main page, with its balance and recent expenses,
   and adding an expense. The page shows the light or the dark screens for the
   theme in force.
-- `Get in touch at hello@eyeoewe.app`.
+- `Get in touch at hello@eyeoewe.app`, with quiet `Privacy` and `Support`
+  links under it.
 
 The whole site, the invitation page too, follows the phone's light or dark
 setting. A small toggle in the header overrides it and remembers the choice on
 that device.
 
-The homepage has no navigation, signup, feature lists, icon rows, stock photos,
-testimonials, analytics or tracking.
+Apart from those two links, the homepage has no navigation,
+signup, feature lists, icon rows, stock photos, testimonials, analytics or
+tracking.
 
 Document metadata may restate approved product positioning, but it does not
 authorise additional visible marketing copy. Adding public claims, pages,
 collection mechanisms, or product surfaces requires a separate product-owner
 decision.
+
+## Public pages
+
+Three reading pages share the homepage's header and closing lines:
+
+- `/privacy/`: the privacy policy.
+- `/support/`: how to get help, and common questions.
+- `/delete-account/`: how to delete an account, in the app or by email, and
+  what is deleted and kept, as Google Play requires.
+
+They state what Eye O Ewe does once it is open to people the owner doesn't
+know. Their wording changes only with the product owner's decision, and they
+carry no forms, scripts other than the theme script, or third-party content.
 
 ## Invitation page
 
