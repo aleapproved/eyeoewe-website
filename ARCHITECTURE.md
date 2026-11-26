@@ -7,19 +7,20 @@
 - Cloudflare Pages publishes the static site. The normal production source is
   the protected `main` branch through the connected Git integration.
 - `public/_headers` defines the static security headers. `public/_redirects`
-  defines the reserved legacy-route redirect. Keep both in the deployed
-  `public/` tree.
+  defines only the invitation rewrite. Keep both in the deployed `public/`
+  tree. There is no `404.html`, so Pages answers an unknown path with the
+  homepage.
 - Static assets belong under `public/` and are referenced by stable,
   root-relative paths. Do not add generated build output or local tooling
   state to the deployable tree.
 - The website has no backend, account data, or tracking, and no runtime
   application code beyond page scripts, all same-origin; `public/_headers`
-  allows nothing else (`script-src 'self'`). `public/theme.js`, on the homepage
-  and the invitation page, applies the visitor's saved light or dark choice and
-  wires the theme toggle. `public/open-invitation.js`, on the invitation page,
-  reads the invitation from the address to build the Join the group button and
-  picks the instruction for the visitor's platform. Neither sends anything, and
-  the invitation script stores nothing.
+  allows nothing else (`script-src 'self'`). `public/theme.js`, on every page,
+  applies the visitor's saved light or dark choice and wires the theme toggle.
+  `public/open-invitation.js`, on the invitation page, reads the invitation
+  from the address to build the Join the group button and picks the
+  instruction for the visitor's platform. Neither sends anything, and the
+  invitation script stores nothing.
 - Before iPhones get a store link in the invitation script, the site must serve
   `/.well-known/apple-app-site-association`, or tapping the invitation link
   again won't open the app.

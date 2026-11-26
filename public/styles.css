@@ -198,6 +198,39 @@ img {
   outline-offset: 5px;
 }
 
+/* The homepage and the public pages end with Get in touch, then the quiet Privacy and Support links. */
+.site-footer {
+  width: 100%;
+  max-width: 34rem;
+  margin: auto auto 0;
+  padding-top: clamp(3.5rem, 9vw, 6.5rem);
+  color: var(--muted);
+  font-size: clamp(1.08rem, 1.7vw, 1.3rem);
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+.site-footer a {
+  color: var(--ink);
+  text-underline-offset: 0.2em;
+}
+
+.footer-links {
+  margin-top: 0.4rem;
+  font-size: 0.85em;
+}
+
+.footer-links a {
+  display: inline-block;
+  padding: 0.4rem 0.2rem;
+  color: var(--muted);
+}
+
 .brand-mark {
   display: block;
   width: 2.75rem;
@@ -210,7 +243,6 @@ img {
 
 .hero {
   display: flex;
-  flex: 1;
   align-items: flex-start;
   width: 100%;
   max-width: 1120px;

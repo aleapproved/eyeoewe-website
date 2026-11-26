@@ -2,7 +2,6 @@
 
 .home-hero,
 .point,
-.touch,
 .screens {
   width: 100%;
   max-width: 1120px;
@@ -19,8 +18,7 @@
   font-size: clamp(2.6rem, 6.2vw, 4.6rem);
 }
 
-.point p,
-.touch {
+.point p {
   max-width: 34rem;
   margin-right: auto;
   margin-left: auto;
@@ -38,8 +36,7 @@
   line-height: 1.1;
 }
 
-.point p,
-.touch {
+.point p {
   margin-top: 0.75rem;
   margin-bottom: 0;
   color: var(--muted);
@@ -47,11 +44,6 @@
   font-weight: 400;
   letter-spacing: -0.01em;
   line-height: 1.4;
-}
-
-.touch a {
-  color: var(--ink);
-  text-underline-offset: 0.2em;
 }
 
 .store-badge {
@@ -113,8 +105,4 @@
 
 :root[data-theme="dark"] .shot-dark {
   display: block;
-}
-
-.touch {
-  margin-top: clamp(3.5rem, 9vw, 6.5rem);
 }
