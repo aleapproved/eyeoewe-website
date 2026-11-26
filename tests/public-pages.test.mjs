@@ -253,7 +253,7 @@ test('says what to do on every platform, and shows the Join button only when the
   assert.match(
     joinBody,
     new RegExp(
-      `<p class="note" id="note-join" hidden>Don’t have the app yet\\? <a id="install-join" href="${installUrl}">Install Eye&nbsp;O&nbsp;Ewe</a>, then come back to this page and tap Join the group\\.</p>`,
+      `<p class="note" id="note-join" hidden>Don’t have the app yet\\? <a id="install-join" href="${installUrl}">Install Eye&nbsp;O&nbsp;Ewe</a>, then come back to this page and tap <strong>Join the group</strong>\\.</p>`,
     ),
   );
   assert.match(
